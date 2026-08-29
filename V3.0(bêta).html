@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OSINT Workspace — v5</title>
+<style>
+:root{--bg:#070b17;--panel:rgba(255,255,255,.07);--panel2:rgba(255,255,255,.11);--border:rgba(255,255,255,.14);--text:#f7f9ff;--muted:#93a1bb;--accent:#38bdf8;--purple:#a855f7;--danger:#fb7185;--ok:#34d399;--warn:#fbbf24;--sidebar:320px;--shadow:0 22px 65px rgba(0,0,0,.35)}
+:root[data-theme=light]{--bg:#edf3f9;--panel:rgba(255,255,255,.75);--panel2:rgba(255,255,255,.95);--border:rgba(15,23,42,.12);--text:#0f172a;--muted:#64748b;--accent:#0284c7;--purple:#7c3aed;--shadow:0 18px 45px rgba(15,23,42,.12)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}body{display:flex;overflow:hidden}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 5% 0%,rgba(14,165,233,.28),transparent 32%),radial-gradient(circle at 90% 90%,rgba(168,85,247,.24),transparent 35%)}.blob{position:absolute;width:450px;height:450px;border-radius:50%;filter:blur(100px);opacity:.3}.b1{background:#0284c7;left:-220px;top:-220px}.b2{background:#7c3aed;right:-220px;bottom:-220px}
+.glass{background:var(--panel);border:1px solid var(--border);backdrop-filter:blur(24px);box-shadow:var(--shadow)}
+.btn{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:11px;padding:9px 13px;font-weight:600;display:inline-flex;align-items:center;gap:7px}.btn:hover{background:var(--panel2)}.btn.primary{background:var(--accent);color:#fff;border-color:transparent}.btn.purple{background:var(--purple);color:#fff;border-color:transparent}.btn.danger{color:var(--danger)}.btn.icon{width:38px;height:38px;padding:0;justify-content:center}
+.sidebar{position:relative;z-index:5;width:var(--sidebar);height:calc(100vh - 20px);margin:10px;padding:14px;border-radius:23px;display:flex;flex-direction:column;gap:10px;transition:.25s}.sidebar.compact{width:74px}.brand{font-weight:800;letter-spacing:.12em;color:var(--accent);font-size:.76rem;white-space:nowrap;overflow:hidden}.side-head{display:flex;align-items:center;justify-content:space-between}.sidebar.compact .brand,.sidebar.compact .side-text,.sidebar.compact .count,.sidebar.compact .new-site,.sidebar.compact .label,.sidebar.compact .cat-tools,.sidebar.compact .socials span,.sidebar.compact .mode-text{display:none}.side-scroll{flex:1;overflow:auto;padding:2px}.label{font-size:.67rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:14px 5px 6px}.nav{width:100%;display:flex;align-items:center;gap:8px;padding:10px;border-radius:11px;border:1px solid transparent;background:transparent;color:var(--muted);text-align:left;font-weight:700}.nav:hover{background:var(--panel2);color:var(--text)}.nav.active{background:rgba(56,189,248,.13);border-color:rgba(56,189,248,.55);color:var(--text)}.nav .grow{flex:1;min-width:0}.nav .count{font-size:.68rem;padding:2px 7px;border:1px solid var(--border);border-radius:20px;color:var(--accent)}.cat-line{display:flex;align-items:center;gap:4px}.cat-line .arrow{width:22px;padding:4px;background:transparent;border:0;color:var(--muted)}.cat-line .cat{flex:1}.cat-tools{display:flex;gap:3px}.cat-tools button{border:0;background:transparent;color:var(--muted);padding:4px}.side-bottom{border-top:1px solid var(--border);padding-top:10px}.socials{display:flex;gap:7px;justify-content:space-between}.socials a{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text);background:var(--panel);border:1px solid var(--border);font-weight:900}.mode{margin-top:8px;width:100%;justify-content:center}
+.main{position:relative;z-index:1;flex:1;min-width:0;height:100vh;overflow:auto;padding:18px}.wrap{max-width:1800px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px}.title h1{font-size:2.05rem;margin:0;background:linear-gradient(135deg,var(--accent),#8b5cf6,var(--purple));-webkit-background-clip:text;color:transparent}.title p{margin:5px 0 0;color:var(--muted);font-size:.87rem}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.search{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:999px;margin-bottom:14px}.search input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:.92rem}.kbd{font-size:.68rem;color:var(--muted);border:1px solid var(--border);padding:3px 7px;border-radius:7px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:14px}.stat{padding:12px 14px;border-radius:15px}.stat small{color:var(--muted);text-transform:uppercase;font-size:.63rem;font-weight:800}.stat strong{display:block;font-size:1.3rem;margin-top:3px}
+.workspace{border-radius:23px;padding:16px;min-height:520px}.workspace-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.workspace-head h2{font-size:1.05rem;margin:0}.toolbar{display:flex;gap:7px;flex-wrap:wrap}.select,.input,.textarea{width:100%;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;padding:9px 11px;outline:0}.textarea{resize:vertical;min-height:120px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.site-card,.target-card{position:relative;border-radius:18px;padding:15px;transition:.18s}.site-card:hover,.target-card:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.5)}.card-actions{position:absolute;right:10px;top:10px;display:flex;gap:4px}.card-actions .favorite-btn{border:0;background:transparent;width:30px;height:30px;padding:0;box-shadow:none;font-size:1.15rem;color:var(--muted);opacity:.95}.card-actions .favorite-btn:hover{background:transparent;transform:scale(1.08)}.card-actions .favorite-btn.is-favorite{color:#fbbf24}.card-actions .edit-btn{width:30px;height:30px;padding:0}.site-head,.target-head{display:flex;gap:11px;padding-right:55px}.avatar{width:46px;height:46px;flex:0 0 46px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(56,189,248,.12);border:1px solid var(--border);font-size:1.25rem}.name{font-weight:650}.meta{font-size:.71rem;color:var(--muted);margin-top:3px}.desc{font-size:.78rem;color:var(--muted);line-height:1.45;margin:11px 0}.badges{display:flex;flex-wrap:wrap;gap:5px}.badge{font-size:.64rem;border:1px solid rgba(56,189,248,.2);background:rgba(56,189,248,.08);color:var(--accent);border-radius:999px;padding:4px 7px}.badge.warn{color:var(--warn);background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2)}.badge.ok{color:var(--ok);background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2)}.foot{border-top:1px solid var(--border);margin-top:12px;padding-top:9px;display:flex;justify-content:space-between;gap:8px;align-items:center}.small{font-size:.68rem;color:var(--muted)}.empty{text-align:center;padding:70px 20px;color:var(--muted);grid-column:1/-1}.empty .big{font-size:3rem}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.58);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:15px}.overlay.open{display:flex}.modal{width:min(1050px,96vw);max-height:94vh;overflow:auto;border-radius:23px;padding:18px}.modal.small{width:min(700px,96vw)}.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.modal-head h3{margin:0}.tabs{display:flex;gap:5px;overflow:auto;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:14px}.tab{white-space:nowrap;border:0;background:transparent;color:var(--muted);padding:8px 10px;border-radius:8px;font-weight:650}.tab.active{background:rgba(56,189,248,.12);color:var(--accent)}.pane{display:none}.pane.active{display:block}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:.67rem;color:var(--muted);font-weight:800;text-transform:uppercase}.list{display:grid;gap:8px}.listrow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--panel)}.listrow .grow{min-width:0}.row{display:grid;grid-template-columns:1fr 1fr;gap:7px}.row.three{grid-template-columns:1fr 1fr 1fr}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.modal-actions .push{margin-right:auto}.check{display:flex;align-items:center;gap:8px}.check input{accent-color:var(--accent)}.progress{height:7px;border-radius:99px;background:var(--panel);overflow:hidden;margin:10px 0}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));width:0}.hint{font-size:.72rem;color:var(--muted);line-height:1.45}.source a{color:var(--accent);word-break:break-all}.toast{position:fixed;right:20px;bottom:20px;z-index:100;padding:11px 14px;border-radius:11px;background:var(--panel2);border:1px solid var(--border);opacity:0;transform:translateY(15px);transition:.2s}.toast.show{opacity:1;transform:none}
+@media(max-width:1150px){.grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){body{display:block;overflow:auto}.sidebar,.sidebar.compact{width:calc(100% - 20px);height:auto;max-height:none;margin:10px}.side-scroll{max-height:330px}.main{height:auto;padding:10px}.top{flex-direction:column;align-items:flex-start}.actions{justify-content:flex-start;width:100%}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.formgrid,.row,.row.three{grid-template-columns:1fr}.field.full{grid-column:auto}.title h1{font-size:1.7rem}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+<aside class="sidebar glass" id="sidebar">
+  <div class="side-head"><div class="brand">⚡ WORKSPACE OSINT</div><button class="btn icon" onclick="toggleSidebar()">◀</button></div>
+
+  <div class="side-scroll">
+    <div class="label">Navigation</div>
+    <button class="nav active" data-view="sites-all" onclick="setView('sites-all')"><span>🌐</span><span class="grow side-text">Tous les sites</span><span id="siteCount" class="count">0</span></button>
+    <button class="nav" data-view="sites-fav" onclick="setView('sites-fav')"><span>⭐</span><span class="grow side-text">Favoris</span><span id="siteFavCount" class="count">0</span></button>
+
+    <div class="label">Catégories & dossiers <button class="btn" style="float:right;padding:2px 7px" onclick="addCategory()">＋</button></div>
+    <div id="categoryList"></div>
+
+    <div class="label">📒 Carnet d'adresses</div>
+    <button class="nav" data-view="targets-all" onclick="openAddressBook('targets-all')"><span>👥</span><span class="grow side-text">Toutes les cibles</span><span id="targetCount" class="count">0</span></button>
+    <button class="nav" data-view="targets-fav" onclick="openAddressBook('targets-fav')"><span>⭐</span><span class="grow side-text">Cibles prioritaires</span><span id="targetFavCount" class="count">0</span></button>
+    <button class="nav" data-view="targets-tasks" onclick="openAddressBook('targets-tasks')"><span>☑️</span><span class="grow side-text">À vérifier</span><span id="targetTaskCount" class="count">0</span></button>
+  </div>
+
+  <div class="side-bottom">
+    <div class="socials">
+      <a href="https://github.com" target="_blank" title="GitHub">◉</a>
+      <a href="https://discord.com" target="_blank" title="Discord">◈</a>
+      <a href="https://x.com" target="_blank" title="X">𝕏</a>
+      <a href="https://telegram.org" target="_blank" title="Telegram">➤</a>
+    </div>
+    <button class="btn mode" onclick="toggleTheme()">☀️ <span class="mode-text">Mode clair / sombre</span></button>
+  </div>
+</aside>
+
+<main class="main" id="mainView">
+<div class="wrap">
+  <div class="top">
+    <div class="title"><h1>OSINT &amp; Social Workspace</h1><p id="subtitle">Ta page principale pour centraliser les sites, outils et ressources.</p></div>
+    <div class="actions">
+      <button class="btn" onclick="saveBackup()">💾 Sauvegarder</button>
+      <button class="btn primary" onclick="openSiteModal()">＋ Ajouter un site</button>
+    </div>
+  </div>
+
+  <div class="search glass"><span>🔎</span><input id="globalSearch" placeholder="Rechercher un site, domaine, description..." oninput="renderMain()"><span class="kbd">Ctrl K</span></div>
+
+  <div class="stats">
+    <div class="stat glass"><small>Sites</small><strong id="statSites">0</strong></div>
+    <div class="stat glass"><small>Favoris</small><strong id="statSiteFav">0</strong></div>
+    <div class="stat glass"><small>Cibles</small><strong id="statTargets">0</strong></div>
+    <div class="stat glass"><small>Sources</small><strong id="statSources">0</strong></div>
+    <div class="stat glass"><small>À vérifier</small><strong id="statTasks">0</strong></div>
+  </div>
+
+  <section class="workspace glass">
+    <div class="workspace-head">
+      <h2 id="mainTitle">🌐 Tous les sites</h2>
+      <div class="toolbar">
+        <select id="siteSort" class="select" style="width:165px" onchange="renderMain()">
+          <option value="updated">Dernière modification</option><option value="name">Nom A → Z</option><option value="category">Catégorie</option><option value="fav">Favoris</option>
+        </select>
+      </div>
+    </div>
+    <div id="siteGrid" class="grid"></div>
+  </section>
+</div>
+</main>
+
+<!-- ADDRESS BOOK -->
+<div class="main hidden" id="addressView">
+<div class="wrap">
+  <div class="top">
+    <div class="title"><h1>📒 Carnet d’adresses</h1><p>Toutes tes personnes/cibles dans un espace séparé des sites.</p></div>
+    <div class="actions"><button class="btn" onclick="closeAddressBook()">← Retour aux sites</button><button class="btn primary" onclick="openTargetModal()">＋ Nouvelle cible</button></div>
+  </div>
+  <div class="search glass"><span>🔎</span><input id="targetSearch" placeholder="Rechercher nom, alias, e-mail, note, source..." oninput="renderTargets()"></div>
+  <section class="workspace glass">
+    <div class="workspace-head"><h2 id="targetTitle">👥 Toutes les cibles</h2><div class="toolbar"><select id="targetSort" class="select" style="width:175px" onchange="renderTargets()"><option value="updated">Dernière activité</option><option value="name">Nom A → Z</option><option value="priority">Priorité</option><option value="confidence">Confiance</option></select></div></div>
+    <div id="targetGrid" class="grid"></div>
+  </section>
+</div>
+</div>
+
+<!-- SITE MODAL -->
+<div class="overlay" id="siteOverlay" onclick="if(event.target===this)closeSiteModal()"><div class="modal small glass">
+  <div class="modal-head"><h3 id="siteModalTitle">＋ Ajouter un site</h3><button class="btn icon" onclick="closeSiteModal()">✕</button></div>
+  <input type="hidden" id="siteId">
+  <div class="formgrid">
+    <div class="field"><label>Nom</label><input id="siteName" class="input" placeholder="Ex : OSINT Framework"></div>
+    <div class="field"><label>URL</label><input id="siteUrl" class="input" placeholder="https://..."></div>
+    <div class="field"><label>Catégorie / dossier</label><select id="siteCategory" class="select"></select></div>
+    <div class="field"><label>Icône</label><input id="siteIcon" class="input" placeholder="🔎"></div>
+    <div class="field full"><label>Description</label><textarea id="siteDesc" class="textarea" rows="4"></textarea></div>
+  </div>
+  <div class="modal-actions"><button class="btn danger" id="deleteSiteBtn" onclick="deleteSite()" style="display:none;margin-right:auto">🗑️ Supprimer</button><button class="btn" onclick="closeSiteModal()">Annuler</button><button class="btn primary" onclick="saveSite()">💾 Enregistrer</button></div>
+</div></div>
+
+<!-- TARGET MODAL -->
+<div class="overlay" id="targetOverlay" onclick="if(event.target===this)closeTargetModal()"><div class="modal glass">
+  <div class="modal-head"><h3 id="targetModalTitle">👤 Nouvelle cible</h3><button class="btn icon" onclick="closeTargetModal()">✕</button></div>
+  <input type="hidden" id="targetId">
+  <div class="tabs">
+    <button class="tab active" data-tab="identity" onclick="tab('identity')">👤 Identité</button>
+    <button class="tab" data-tab="identifiers" onclick="tab('identifiers')">🔎 Identifiants</button>
+    <button class="tab" data-tab="socials" onclick="tab('socials')">🌐 Réseaux</button>
+    <button class="tab" data-tab="sources" onclick="tab('sources')">📚 Sources</button>
+    <button class="tab" data-tab="notes" onclick="tab('notes')">📝 Notes</button>
+    <button class="tab" data-tab="timeline" onclick="tab('timeline')">🕒 Chronologie</button>
+    <button class="tab" data-tab="relations" onclick="tab('relations')">🕸️ Relations</button>
+    <button class="tab" data-tab="tasks" onclick="tab('tasks')">☑️ Tâches</button>
+  </div>
+  <div class="pane active" id="pane-identity">
+    <div class="formgrid">
+      <div class="field"><label>Nom affiché</label><input id="tName" class="input" placeholder="Nom ou pseudonyme principal"></div>
+      <div class="field"><label>Statut</label><select id="tStatus" class="select"><option>À identifier</option><option>En recherche</option><option>Confirmée</option><option>Archivée</option></select></div>
+      <div class="field"><label>Priorité</label><select id="tPriority" class="select"><option value="1">Basse</option><option value="2">Normale</option><option value="3">Haute</option><option value="4">Critique</option></select></div>
+      <div class="field"><label>Confiance</label><select id="tConfidence" class="select"><option value="1">Faible</option><option value="2">Moyenne</option><option value="3">Forte</option></select></div>
+      <div class="field"><label>Alias / pseudos</label><input id="tAliases" class="input" placeholder="pseudo1, pseudo2, variante"></div>
+      <div class="field"><label>Catégorie</label><select id="tCategory" class="select"></select></div>
+      <div class="field"><label>Localisation publique</label><input id="tLocation" class="input" placeholder="Ville / pays si pertinent"></div>
+      <div class="field"><label>Organisation / profession</label><input id="tWork" class="input"></div>
+      <div class="field"><label>E-mail(s)</label><input id="tEmail" class="input"></div>
+      <div class="field"><label>Téléphone(s)</label><input id="tPhone" class="input"></div>
+      <div class="field full"><label>Résumé de travail</label><textarea id="tSummary" class="textarea"></textarea></div>
+      <div class="field full"><label>Tags</label><input id="tTags" class="input" placeholder="pseudo, entreprise, forum, photo..."></div>
+    </div>
+  </div>
+  <div class="pane" id="pane-identifiers"><div class="hint">Ajoute les identifiants et le contexte/provenance de chacun.</div><div id="identifierList" class="list" style="margin:10px 0"></div><button class="btn" onclick="addIdentifier()">＋ Ajouter</button></div>
+  <div class="pane" id="pane-socials"><div id="socialList" class="list" style="margin-bottom:10px"></div><button class="btn" onclick="addSocial()">＋ Ajouter un profil</button></div>
+  <div class="pane" id="pane-sources"><div id="sourceList" class="list" style="margin-bottom:10px"></div><button class="btn" onclick="addSource()">＋ Ajouter une source</button></div>
+  <div class="pane" id="pane-notes"><div class="field"><label>Notes d'enquête</label><textarea id="tNotes" class="textarea" style="min-height:380px" placeholder="Observations, hypothèses, contradictions, pistes..."></textarea></div></div>
+  <div class="pane" id="pane-timeline"><div id="timelineList" class="list" style="margin-bottom:10px"></div><button class="btn" onclick="addTimeline()">＋ Ajouter un événement</button></div>
+  <div class="pane" id="pane-relations"><div id="relationList" class="list" style="margin-bottom:10px"></div><button class="btn" onclick="addRelation()">＋ Ajouter une relation</button></div>
+  <div class="pane" id="pane-tasks"><div id="taskList" class="list"></div><div class="progress"><i id="taskProgress"></i></div><button class="btn" onclick="addTask()">＋ Ajouter une tâche</button></div>
+  <div class="modal-actions"><button class="btn danger" id="deleteTargetBtn" onclick="deleteTarget()" style="display:none;margin-right:auto">🗑️ Supprimer</button><button class="btn" onclick="closeTargetModal()">Annuler</button><button class="btn primary" onclick="saveTarget()">💾 Enregistrer</button></div>
+</div></div>
+
+<div class="overlay" id="importOverlay"><div class="modal small glass"><div class="modal-head"><h3>Importer une sauvegarde</h3></div><p class="hint">Choisis un fichier JSON exporté par ce workspace.</p><input type="file" id="importFile" accept="application/json" class="input" style="margin-top:10px"><div class="modal-actions"><button class="btn" onclick="closeOverlay('importOverlay')">Annuler</button><button class="btn primary" onclick="importBackup()">Importer</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+const KEY='osint_workspace_v5';
+const DEFAULT={
+ theme:'dark',
+ globalNote:'',
+ categories:[
+  {id:'osint',name:'OSINT',icon:'🕵️',open:true},
+  {id:'social',name:'Réseaux sociaux',icon:'🌐',open:true},
+  {id:'ip',name:'Réseaux & IP',icon:'🛰️',open:true}
+ ],
+ sites:[
+  {id:'s1',name:'OSINT Framework',url:'https://osintframework.com',icon:'🕵️',desc:'Arborescence de ressources OSINT.',category:'osint',favorite:false,updated:Date.now()},
+  {id:'s2',name:'WhatsMyName',url:'https://whatsmyname.app',icon:'🔎',desc:'Recherche de pseudonymes sur différents services.',category:'social',favorite:false,updated:Date.now()},
+  {id:'s3',name:'Shodan',url:'https://www.shodan.io',icon:'🌐',desc:'Recherche d’actifs et services exposés publiquement.',category:'ip',favorite:false,updated:Date.now()}
+ ],
+ targets:[]
+};
+
+let state=loadState();
+let currentView='sites-all';
+let targetFilter='targets-all';
+let editingSite=null;
+let editingTarget=null;
+let activeTab='identity';
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function uid(){return (crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2))}
+function loadState(){
+ try{
+  const raw=localStorage.getItem(KEY);
+  if(!raw)return clone(DEFAULT);
+  const x=JSON.parse(raw);
+  x.categories=Array.isArray(x.categories)&&x.categories.length?x.categories:clone(DEFAULT.categories);
+  x.sites=Array.isArray(x.sites)?x.sites:[];
+  x.targets=Array.isArray(x.targets)?x.targets:[];
+  x.theme=x.theme==='light'?'light':'dark';
+  return x;
+ }catch(e){return clone(DEFAULT)}
+}
+function normalizeTarget(t){
+ return Object.assign({id:uid(),name:'Sans nom',status:'À identifier',priority:2,confidence:1,aliases:'',category:state.categories[0]?.id||'osint',location:'',work:'',email:'',phone:'',summary:'',tags:'',notes:'',favorite:false,updated:Date.now(),identifiers:[],socials:[],sources:[],timeline:[],relations:[],tasks:[]},t)
+}
+function persist(){localStorage.setItem(KEY,JSON.stringify(state));document.documentElement.dataset.theme=state.theme;updateStats()}
+function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');clearTimeout(window._toast);window._toast=setTimeout(()=>e.classList.remove('show'),1700)}
+function esc(v=''){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function safeUrl(url){if(!url)return '#';if(/^https?:\/\//i.test(url))return url;return 'https://'+url}
+
+function updateStats(){
+ const fav=state.sites.filter(x=>x.favorite).length;
+ const sources=state.targets.reduce((n,t)=>n+(t.sources?.length||0),0);
+ const tasks=state.targets.reduce((n,t)=>n+(t.tasks||[]).filter(x=>!x.done).length,0);
+ const map={siteCount:state.sites.length,siteFavCount:fav,targetCount:state.targets.length,targetFavCount:state.targets.filter(x=>x.favorite).length,targetTaskCount:tasks,statSites:state.sites.length,statSiteFav:fav,statTargets:state.targets.length,statSources:sources,statTasks:tasks};
+ Object.entries(map).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v});
+}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('compact')}
+function toggleTheme(){state.theme=state.theme==='dark'?'light':'dark';persist();toast(state.theme==='light'?'Mode clair':'Mode sombre')}
+function setView(v){
+ currentView=v;
+ // Toujours revenir à la page principale lorsqu'on choisit un élément
+ // de navigation lié aux sites.
+ if(!document.getElementById('addressView').classList.contains('hidden')){
+   document.getElementById('addressView').classList.add('hidden');
+   document.getElementById('mainView').classList.remove('hidden');
+ }
+ document.querySelectorAll('.nav[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));
+ document.querySelectorAll('.nav[data-cat]').forEach(x=>x.classList.remove('active'));
+ if(v.startsWith('targets-')){openAddressBook(v);return}
+ renderMain();
+}
+function renderCategories(){
+ const box=document.getElementById('categoryList');box.innerHTML='';
+ state.categories.forEach(c=>{
+  const count=state.sites.filter(s=>s.category===c.id).length;
+  const line=document.createElement('div');line.className='cat-line';
+  const isActive=currentView==='category:'+c.id;
+  line.innerHTML=`<button class="arrow" title="Replier/déplier" onclick="toggleCategory('${c.id}')">${c.open?'⌄':'›'}</button><button class="nav cat ${isActive?'active':''}" data-cat="${esc(c.id)}" onclick="setCategory('${esc(c.id)}')"><span>${esc(c.icon)}</span><span class="grow side-text">${esc(c.name)}</span><span class="count">${count}</span></button><span class="cat-tools"><button title="Renommer" onclick="renameCategory('${esc(c.id)}')">✎</button><button title="Supprimer" onclick="deleteCategory('${esc(c.id)}')">×</button></span>`;
+  box.appendChild(line);
+ });
+}
+function setCategory(id){
+ currentView='category:'+id;
+ // Si le carnet est ouvert, on le ferme avant d'afficher le dossier.
+ document.getElementById('addressView').classList.add('hidden');
+ document.getElementById('mainView').classList.remove('hidden');
+ document.querySelectorAll('.nav[data-view]').forEach(x=>x.classList.remove('active'));
+ document.querySelectorAll('.nav[data-cat]').forEach(x=>x.classList.toggle('active',x.dataset.cat===id));
+ renderMain();
+}
+function toggleCategory(id){const c=state.categories.find(x=>x.id===id);if(c){c.open=!c.open;persist();renderCategories()}}
+function addCategory(){
+ const name=prompt('Nom de la catégorie / dossier :');if(!name?.trim())return;
+ if(state.categories.some(c=>c.name.toLowerCase()===name.trim().toLowerCase()))return alert('Cette catégorie existe déjà.');
+ const icon=prompt('Icône :','📁')||'📁';state.categories.push({id:uid(),name:name.trim(),icon:icon.trim(),open:true});persist();renderCategories();fillCategorySelects();toast('Catégorie créée');
+}
+function renameCategory(id){
+ const c=state.categories.find(x=>x.id===id);if(!c)return;
+ const n=prompt('Nouveau nom :',c.name);if(!n?.trim())return;c.name=n.trim();persist();renderCategories();renderMain();
+}
+function deleteCategory(id){
+ if(state.categories.length<=1)return alert('Il faut conserver au moins une catégorie.');
+ const c=state.categories.find(x=>x.id===id);if(!c)return;
+ if(!confirm(`Supprimer « ${c.name} » ? Les sites seront déplacés dans la première catégorie.`))return;
+ const fallback=state.categories.find(x=>x.id!==id);
+ state.sites.forEach(s=>{if(s.category===id)s.category=fallback.id});
+ state.targets.forEach(t=>{if(t.category===id)t.category=fallback.id});
+ state.categories=state.categories.filter(x=>x.id!==id);if(currentView==='category:'+id)currentView='sites-all';persist();renderAll();toast('Catégorie supprimée');
+}
+
+function renderMain(){
+ renderCategories();updateStats();
+ const q=document.getElementById('globalSearch').value.toLowerCase().trim();
+ let arr=[...state.sites];let title='🌐 Tous les sites';
+ if(currentView==='sites-fav'){arr=arr.filter(x=>x.favorite);title='⭐ Favoris'}
+ if(currentView.startsWith('category:')){const id=currentView.split(':')[1],c=state.categories.find(x=>x.id===id);arr=arr.filter(x=>x.category===id);title=(c?.icon||'📁')+' '+(c?.name||'Dossier')}
+ if(q)arr=arr.filter(x=>JSON.stringify(x).toLowerCase().includes(q));
+ const sort=document.getElementById('siteSort').value;
+ arr.sort((a,b)=>sort==='name'?a.name.localeCompare(b.name):sort==='category'?(a.category.localeCompare(b.category)):sort==='fav'?(+b.favorite-+a.favorite):b.updated-a.updated);
+ document.getElementById('mainTitle').textContent=title;
+ const grid=document.getElementById('siteGrid');grid.innerHTML='';
+ if(!arr.length){grid.innerHTML='<div class="empty"><div class="big">🌐</div><h3>Aucun site</h3><p>Ajoute une ressource avec « Ajouter un site ».</p></div>';return}
+ arr.forEach(s=>grid.appendChild(siteCard(s)));
+}
+function siteCard(s){
+ const e=document.createElement('article');e.className='site-card glass';
+ const cat=state.categories.find(c=>c.id===s.category);
+ e.innerHTML=`<div class="card-actions"><button class="btn icon favorite-btn ${s.favorite?'is-favorite':''}" title="Favori" onclick="toggleSiteFav('${s.id}',event)">${s.favorite?'★':'☆'}</button><button class="btn icon edit-btn" title="Modifier" onclick="openSiteModal('${s.id}',event)">✎</button></div><div class="site-head"><div class="avatar">${esc(s.icon||'🔗')}</div><div><div class="name">${esc(s.name)}</div><div class="meta">${esc(s.url||'')}</div></div></div><div class="desc">${esc(s.desc||'Aucune description')}</div><div class="badges"><span class="badge">${esc(cat?.icon||'📁')} ${esc(cat?.name||'')}</span></div><div class="foot"><span class="small">${new Date(s.updated).toLocaleDateString('fr-FR')}</span><a class="btn" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener">Ouvrir ↗</a></div>`;
+ return e;
+}
+function toggleSiteFav(id,e){e.stopPropagation();const s=state.sites.find(x=>x.id===id);if(s){s.favorite=!s.favorite;s.updated=Date.now();persist();renderMain();toast(s.favorite?'Ajouté aux favoris':'Retiré des favoris')}}
+function fillCategorySelects(){
+ const selects=[document.getElementById('siteCategory'),document.getElementById('tCategory')];
+ selects.forEach(sel=>{if(!sel)return;const old=sel.value;sel.innerHTML=state.categories.map(c=>`<option value="${esc(c.id)}">${esc(c.icon)} ${esc(c.name)}</option>`).join('');if(state.categories.some(c=>c.id===old))sel.value=old});
+}
+function openSiteModal(id=null,e){
+ if(e)e.stopPropagation();editingSite=id?state.sites.find(x=>x.id===id):null;
+ fillCategorySelects();
+ document.getElementById('siteModalTitle').textContent=editingSite?'✎ Modifier le site':'＋ Ajouter un site';
+ document.getElementById('deleteSiteBtn').style.display=editingSite?'inline-flex':'none';
+ document.getElementById('siteId').value=editingSite?.id||'';
+ document.getElementById('siteName').value=editingSite?.name||'';
+ document.getElementById('siteUrl').value=editingSite?.url||'';
+ document.getElementById('siteIcon').value=editingSite?.icon||'🔎';
+ document.getElementById('siteDesc').value=editingSite?.desc||'';
+ document.getElementById('siteCategory').value=editingSite?.category||state.categories[0]?.id||'';
+ document.getElementById('siteOverlay').classList.add('open');
+}
+function closeSiteModal(){document.getElementById('siteOverlay').classList.remove('open');editingSite=null}
+function saveSite(){
+ const name=document.getElementById('siteName').value.trim(),url=document.getElementById('siteUrl').value.trim();
+ if(!name||!url)return alert('Le nom et l’URL sont obligatoires.');
+ if(editingSite){Object.assign(editingSite,{name,url,icon:document.getElementById('siteIcon').value.trim()||'🔎',desc:document.getElementById('siteDesc').value.trim(),category:document.getElementById('siteCategory').value,updated:Date.now()})}
+ else state.sites.push({id:uid(),name,url,icon:document.getElementById('siteIcon').value.trim()||'🔎',desc:document.getElementById('siteDesc').value.trim(),category:document.getElementById('siteCategory').value, favorite:false,updated:Date.now()});
+ persist();closeSiteModal();renderAll();toast('Site enregistré');
+}
+function deleteSite(){
+ if(!editingSite)return;if(confirm(`Supprimer « ${editingSite.name} » ?`)){state.sites=state.sites.filter(x=>x.id!==editingSite.id);persist();closeSiteModal();renderAll();toast('Site supprimé')}
+}
+
+function openAddressBook(filter='targets-all'){
+ targetFilter=filter;
+ document.getElementById('mainView').classList.add('hidden');
+ document.getElementById('addressView').classList.remove('hidden');
+ document.querySelectorAll('.nav[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===filter));
+ document.querySelectorAll('.nav[data-cat]').forEach(x=>x.classList.remove('active'));
+ renderTargets();
+}
+function closeAddressBook(){document.getElementById('addressView').classList.add('hidden');document.getElementById('mainView').classList.remove('hidden');currentView='sites-all';document.querySelectorAll('.nav[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view==='sites-all'));document.querySelectorAll('.nav[data-cat]').forEach(x=>x.classList.remove('active'));renderMain()}
+function renderTargets(){
+ const q=document.getElementById('targetSearch').value.toLowerCase().trim();
+ let arr=state.targets.map(normalizeTarget);
+ if(targetFilter==='targets-fav')arr=arr.filter(t=>t.favorite);
+ if(targetFilter==='targets-tasks')arr=arr.filter(t=>(t.tasks||[]).some(x=>!x.done));
+ if(q)arr=arr.filter(t=>JSON.stringify(t).toLowerCase().includes(q));
+ const titles={'targets-all':'👥 Toutes les cibles','targets-fav':'⭐ Cibles prioritaires','targets-tasks':'☑️ À vérifier'};
+ document.getElementById('targetTitle').textContent=titles[targetFilter]||'👥 Toutes les cibles';
+ const sort=document.getElementById('targetSort').value;
+ arr.sort((a,b)=>sort==='name'?a.name.localeCompare(b.name):sort==='priority'?b.priority-a.priority:sort==='confidence'?b.confidence-a.confidence:b.updated-a.updated);
+ const grid=document.getElementById('targetGrid');grid.innerHTML='';
+ if(!arr.length){grid.innerHTML='<div class="empty"><div class="big">👥</div><h3>Aucune cible</h3><p>Crée une fiche pour commencer ton carnet d’adresses.</p><button class="btn primary" onclick="openTargetModal()" style="margin-top:12px">＋ Nouvelle cible</button></div>';return}
+ arr.forEach(t=>grid.appendChild(targetCard(t)));
+}
+function targetCard(t){
+ const e=document.createElement('article');e.className='target-card glass';
+ const p=['','Basse','Normale','Haute','Critique'][t.priority]||'Normale',c=['','Faible','Moyenne','Forte'][t.confidence]||'Faible';
+ const open=(t.tasks||[]).filter(x=>!x.done).length;
+ e.innerHTML=`<div class="card-actions"><button class="btn icon favorite-btn ${t.favorite?'is-favorite':''}" title="Favori" onclick="toggleTargetFav('${t.id}',event)">${t.favorite?'★':'☆'}</button><button class="btn icon edit-btn" title="Modifier" onclick="openTargetModal('${t.id}',event)">✎</button></div><div class="target-head"><div class="avatar">👤</div><div><div class="name">${esc(t.name||t.aliases||'Sans nom')}</div><div class="meta">${esc(t.status)} • ${esc(t.location||'Localisation non renseignée')}</div></div></div><div class="desc">${esc(t.summary||t.notes||'Aucune note pour le moment.')}</div><div class="badges"><span class="badge ${t.priority>=3?'warn':''}">Priorité ${p}</span><span class="badge ${t.confidence===3?'ok':''}">Confiance ${c}</span>${open?`<span class="badge">${open} à vérifier</span>`:''}</div><div class="badges" style="margin-top:6px">${String(t.tags||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,5).map(x=>`<span class="badge">#${esc(x)}</span>`).join('')}</div><div class="foot"><span class="small">🌐 ${(t.socials||[]).length} • 📚 ${(t.sources||[]).length} • 📝 ${t.notes?.trim()?1:0}</span><button class="btn" onclick="openTargetModal('${t.id}',event)">Ouvrir la fiche →</button></div>`;
+ return e;
+}
+function toggleTargetFav(id,e){e.stopPropagation();const t=state.targets.find(x=>x.id===id);if(t){t.favorite=!t.favorite;t.updated=Date.now();persist();renderTargets();toast('Fiche mise à jour')}}
+function openTargetModal(id=null,e){
+ if(e)e.stopPropagation();editingTarget=id?state.targets.find(x=>x.id===id):null;
+ fillCategorySelects();
+ document.getElementById('targetModalTitle').textContent=editingTarget?'✎ Modifier la cible':'👤 Nouvelle cible';
+ document.getElementById('deleteTargetBtn').style.display=editingTarget?'inline-flex':'none';
+ const t=editingTarget||normalizeTarget({id:uid()});
+ document.getElementById('targetId').value=t.id;
+ const map={tName:'name',tStatus:'status',tPriority:'priority',tConfidence:'confidence',tAliases:'aliases',tCategory:'category',tLocation:'location',tWork:'work',tEmail:'email',tPhone:'phone',tSummary:'summary',tTags:'tags',tNotes:'notes'};
+ Object.entries(map).forEach(([el,k])=>document.getElementById(el).value=t[k]??'');
+ renderSubLists(t);tab('identity');document.getElementById('targetOverlay').classList.add('open');
+}
+function closeTargetModal(){document.getElementById('targetOverlay').classList.remove('open');editingTarget=null}
+function saveTarget(){
+ const name=document.getElementById('tName').value.trim(),aliases=document.getElementById('tAliases').value.trim();
+ if(!name&&!aliases)return alert('Ajoute au moins un nom ou pseudonyme.');
+ let t=editingTarget;if(!t){t=normalizeTarget({id:document.getElementById('targetId').value});state.targets.unshift(t)}
+ Object.assign(t,{name:name||aliases,status:document.getElementById('tStatus').value,priority:+document.getElementById('tPriority').value,confidence:+document.getElementById('tConfidence').value,aliases,category:document.getElementById('tCategory').value,location:document.getElementById('tLocation').value.trim(),work:document.getElementById('tWork').value.trim(),email:document.getElementById('tEmail').value.trim(),phone:document.getElementById('tPhone').value.trim(),summary:document.getElementById('tSummary').value.trim(),tags:document.getElementById('tTags').value.trim(),notes:document.getElementById('tNotes').value,updated:Date.now()});
+ readSubLists(t);persist();closeTargetModal();renderAll();renderTargets();toast('Fiche cible enregistrée');
+}
+function deleteTarget(){if(!editingTarget)return;if(confirm(`Supprimer la fiche « ${editingTarget.name||'Sans nom'} » ?`)){state.targets=state.targets.filter(x=>x.id!==editingTarget.id);persist();closeTargetModal();renderAll();renderTargets();toast('Cible supprimée')}}
+function tab(n){activeTab=n;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===n));document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('active',x.id==='pane-'+n))}
+function renderSubLists(t){
+ document.getElementById('identifierList').innerHTML=(t.identifiers||[]).map((x,i)=>`<div class="listrow"><div class="grow"><div class="row"><input class="input id-label" value="${esc(x.label)}" placeholder="Type"><input class="input id-value" value="${esc(x.value)}" placeholder="Valeur"></div><input class="input id-source" style="margin-top:7px" value="${esc(x.source)}" placeholder="Contexte / provenance"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>`).join('');
+ document.getElementById('socialList').innerHTML=(t.socials||[]).map(x=>`<div class="listrow"><div class="grow"><div class="row"><input class="input social-platform" value="${esc(x.platform)}" placeholder="Plateforme"><input class="input social-user" value="${esc(x.username)}" placeholder="Pseudo"></div><input class="input social-url" style="margin-top:7px" value="${esc(x.url)}" placeholder="URL du profil"><input class="input social-note" style="margin-top:7px" value="${esc(x.note)}" placeholder="Observation"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>`).join('');
+ document.getElementById('sourceList').innerHTML=(t.sources||[]).map(x=>`<div class="listrow"><div class="grow"><div class="row three"><input class="input src-title" value="${esc(x.title)}" placeholder="Titre"><select class="select src-type"><option ${x.type==='Page'?'selected':''}>Page</option><option ${x.type==='Profil'?'selected':''}>Profil</option><option ${x.type==='Archive'?'selected':''}>Archive</option><option ${x.type==='Document'?'selected':''}>Document</option><option ${x.type==='Autre'?'selected':''}>Autre</option></select><select class="select src-conf"><option ${x.confidence==='Faible'?'selected':''}>Faible</option><option ${x.confidence==='Moyenne'?'selected':''}>Moyenne</option><option ${x.confidence==='Forte'?'selected':''}>Forte</option></select></div><input class="input src-url" style="margin-top:7px" value="${esc(x.url)}" placeholder="https://..."><input class="input src-note" style="margin-top:7px" value="${esc(x.note)}" placeholder="Ce que la source apporte"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>`).join('');
+ document.getElementById('timelineList').innerHTML=(t.timeline||[]).map(x=>`<div class="listrow"><div class="grow"><div class="row"><input class="input tl-date" type="date" value="${esc(x.date)}"><input class="input tl-event" value="${esc(x.event)}" placeholder="Événement"></div><textarea class="textarea tl-detail" style="min-height:65px;margin-top:7px">${esc(x.detail)}</textarea></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>`).join('');
+ document.getElementById('relationList').innerHTML=(t.relations||[]).map(x=>`<div class="listrow"><div class="grow"><div class="row"><input class="input rel-name" value="${esc(x.name)}" placeholder="Nom / alias"><input class="input rel-type" value="${esc(x.type)}" placeholder="Relation"></div><input class="input rel-note" style="margin-top:7px" value="${esc(x.note)}" placeholder="Pourquoi ce lien est pertinent"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>`).join('');
+ document.getElementById('taskList').innerHTML=(t.tasks||[]).map(x=>`<div class="listrow"><div class="check"><input class="task-done" type="checkbox" ${x.done?'checked':''} onchange="updateTaskProgress()"><input class="input task-text" value="${esc(x.text)}" placeholder="Tâche à vérifier"></div><button class="btn danger" onclick="this.parentElement.remove();updateTaskProgress()">×</button></div>`).join('');updateTaskProgress();
+}
+function addIdentifier(){document.getElementById('identifierList').insertAdjacentHTML('beforeend','<div class="listrow"><div class="grow"><div class="row"><input class="input id-label" placeholder="Type"><input class="input id-value" placeholder="Valeur"></div><input class="input id-source" style="margin-top:7px" placeholder="Contexte / provenance"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>')}
+function addSocial(){document.getElementById('socialList').insertAdjacentHTML('beforeend','<div class="listrow"><div class="grow"><div class="row"><input class="input social-platform" placeholder="Plateforme"><input class="input social-user" placeholder="Pseudo"></div><input class="input social-url" style="margin-top:7px" placeholder="URL du profil"><input class="input social-note" style="margin-top:7px" placeholder="Observation"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>')}
+function addSource(){document.getElementById('sourceList').insertAdjacentHTML('beforeend','<div class="listrow"><div class="grow"><div class="row three"><input class="input src-title" placeholder="Titre"><select class="select src-type"><option>Page</option><option>Profil</option><option>Archive</option><option>Document</option><option>Autre</option></select><select class="select src-conf"><option>Faible</option><option>Moyenne</option><option>Forte</option></select></div><input class="input src-url" style="margin-top:7px" placeholder="https://..."><input class="input src-note" style="margin-top:7px" placeholder="Ce que la source apporte"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>')}
+function addTimeline(){document.getElementById('timelineList').insertAdjacentHTML('beforeend','<div class="listrow"><div class="grow"><div class="row"><input class="input tl-date" type="date"><input class="input tl-event" placeholder="Événement"></div><textarea class="textarea tl-detail" style="min-height:65px;margin-top:7px" placeholder="Détail"></textarea></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>')}
+function addRelation(){document.getElementById('relationList').insertAdjacentHTML('beforeend','<div class="listrow"><div class="grow"><div class="row"><input class="input rel-name" placeholder="Nom / alias"><input class="input rel-type" placeholder="Relation"></div><input class="input rel-note" style="margin-top:7px" placeholder="Pourquoi ce lien est pertinent"></div><button class="btn danger" onclick="this.parentElement.remove()">×</button></div>')}
+function addTask(){document.getElementById('taskList').insertAdjacentHTML('beforeend','<div class="listrow"><div class="check"><input class="task-done" type="checkbox" onchange="updateTaskProgress()"><input class="input task-text" placeholder="Tâche à vérifier"></div><button class="btn danger" onclick="this.parentElement.remove();updateTaskProgress()">×</button></div>');updateTaskProgress()}
+function updateTaskProgress(){const rows=[...document.querySelectorAll('#taskList .listrow')],done=rows.filter(r=>r.querySelector('.task-done')?.checked).length;document.getElementById('taskProgress').style.width=rows.length?(done/rows.length*100)+'%':'0%'}
+function readSubLists(t){
+ t.identifiers=[...document.querySelectorAll('#identifierList .listrow')].map(r=>({label:r.querySelector('.id-label')?.value.trim()||'',value:r.querySelector('.id-value')?.value.trim()||'',source:r.querySelector('.id-source')?.value.trim()||''})).filter(x=>x.label||x.value||x.source);
+ t.socials=[...document.querySelectorAll('#socialList .listrow')].map(r=>({platform:r.querySelector('.social-platform')?.value.trim()||'',username:r.querySelector('.social-user')?.value.trim()||'',url:r.querySelector('.social-url')?.value.trim()||'',note:r.querySelector('.social-note')?.value.trim()||''})).filter(x=>x.platform||x.username||x.url||x.note);
+ t.sources=[...document.querySelectorAll('#sourceList .listrow')].map(r=>({title:r.querySelector('.src-title')?.value.trim()||'',type:r.querySelector('.src-type')?.value||'Page',confidence:r.querySelector('.src-conf')?.value||'Moyenne',url:r.querySelector('.src-url')?.value.trim()||'',note:r.querySelector('.src-note')?.value.trim()||''})).filter(x=>x.title||x.url||x.note);
+ t.timeline=[...document.querySelectorAll('#timelineList .listrow')].map(r=>({date:r.querySelector('.tl-date')?.value||'',event:r.querySelector('.tl-event')?.value.trim()||'',detail:r.querySelector('.tl-detail')?.value.trim()||''})).filter(x=>x.date||x.event||x.detail);
+ t.relations=[...document.querySelectorAll('#relationList .listrow')].map(r=>({name:r.querySelector('.rel-name')?.value.trim()||'',type:r.querySelector('.rel-type')?.value.trim()||'',note:r.querySelector('.rel-note')?.value.trim()||''})).filter(x=>x.name||x.type||x.note);
+ t.tasks=[...document.querySelectorAll('#taskList .listrow')].map(r=>({done:!!r.querySelector('.task-done')?.checked,text:r.querySelector('.task-text')?.value.trim()||''})).filter(x=>x.text);
+}
+function saveBackup(){
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='osint-workspace-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Sauvegarde JSON créée');
+}
+function importBackup(){
+ const f=document.getElementById('importFile').files[0];if(!f)return alert('Choisis un fichier JSON.');
+ const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.sites)||!Array.isArray(x.targets)||!Array.isArray(x.categories))throw Error();state=x;persist();closeOverlay('importOverlay');renderAll();toast('Sauvegarde importée')}catch{alert('Fichier JSON invalide.')}};r.readAsText(f);
+}
+function closeOverlay(id){document.getElementById(id).classList.remove('open')}
+function renderAll(){fillCategorySelects();renderCategories();renderMain();updateStats();if(!document.getElementById('addressView').classList.contains('hidden'))renderTargets()}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();const el=document.getElementById(document.getElementById('addressView').classList.contains('hidden')?'globalSearch':'targetSearch');el.focus();el.select()}if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(x=>x.classList.remove('open'))});
+document.documentElement.dataset.theme=state.theme;
+renderAll();
+</script>
+</body>
+</html>
