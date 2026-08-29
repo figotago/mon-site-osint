@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<html lang="fr" data-theme="dark"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT &amp; AI Workspace - Liquid Glass Edition</title>
+    
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #0f172a 50%, #030712 100%);
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-bg-hover: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-border-light: rgba(255, 255, 255, 0.3);
+            --glass-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(56, 189, 248, 0.2) 100%);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.35);
+            --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            --danger-color: #f43f5e;
+            --sidebar-width: 320px;
+            --select-option-bg: #0f172a;
+            --select-option-color: #f8fafc;
+            --title-gradient: linear-gradient(135deg, #38bdf8 0%, #a855f7 50%, #ec4899 100%);
+            --columns-count: 3;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --star-color: #f59e0b;
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: radial-gradient(circle at 50% -20%, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-bg-hover: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-border-light: rgba(255, 255, 255, 0.9);
+            --glass-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(2, 132, 199, 0.15) 100%);
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.25);
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            --danger-color: #e11d48;
+            --select-option-bg: #ffffff;
+            --select-option-color: #0f172a;
+            --title-gradient: linear-gradient(135deg, #0284c7 0%, #6366f1 50%, #d946ef 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+       html, body {
+         width: 100%;
+         height: 100%;
+         overflow: hidden;
+}
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .background-blobs {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            animation: liquidMove 22s infinite ease-in-out alternate;
+            will-change: transform;
+        }
+
+        .blob-1 { width: 700px; height: 700px; background: var(--accent-glow); top: -200px; left: -150px; }
+        .blob-2 { width: 650px; height: 650px; background: rgba(168, 85, 247, 0.2); bottom: -200px; right: -100px; animation-delay: -8s; }
+        .blob-3 { width: 450px; height: 450px; background: rgba(236, 72, 153, 0.15); top: 30%; right: 25%; animation-delay: -15s; }
+
+        @keyframes liquidMove {
+            0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate3d(60px, -40px, 0) scale(1.1) rotate(120deg); }
+            100% { transform: translate3d(-40px, 60px, 0) scale(0.95) rotate(240deg); }
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(210%);
+            -webkit-backdrop-filter: blur(40px) saturate(210%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-lg);
+            padding: 1px;
+            background: var(--glass-shine);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .btn-glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.83rem;
+            cursor: pointer;
+            backdrop-filter: blur(25px);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-glass:hover {
+            background: var(--glass-bg-hover);
+            transform: translateY(-2px) scale(1.01);
+            border-color: var(--glass-border-light);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        .btn-glass:active { transform: translateY(0) scale(0.97); }
+        .btn-danger { color: var(--danger-color); }
+        .btn-danger:hover { background: rgba(244, 63, 94, 0.15); border-color: var(--danger-color); box-shadow: 0 8px 25px rgba(244, 63, 94, 0.25); }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: var(--accent-color);
+            filter: brightness(1.1);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        /* SIDEBAR */
+        sidebar {
+            width: var(--sidebar-width);
+            margin: 1.25rem 0 1.25rem 1.25rem;
+            padding: 1.25rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex-shrink: 0;
+            height: calc(100vh - 2.5rem);
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
+            transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s ease;
+        }
+
+        body.sidebar-minimized sidebar {
+            width: 80px;
+            padding: 1.25rem 0.5rem;
+        }
+
+        .sidebar-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%;
+        }
+
+        body.sidebar-minimized sidebar .sidebar-header { justify-content: center; }
+
+        .sidebar-title { 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            color: var(--accent-color); 
+            letter-spacing: 0.1em; 
+            text-transform: uppercase;
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity 0.2s ease;
+        }
+
+        body.sidebar-minimized sidebar .sidebar-title { opacity: 0; pointer-events: none; width: 0; }
+
+        .toggle-btn-sidebar { padding: 6px 10px; font-size: 0.8rem; border-radius: 10px; cursor: pointer; flex-shrink: 0; }
+
+        .add-folder-top { width: 100%; white-space: nowrap; overflow: hidden; transition: opacity 0.2s ease; }
+        body.sidebar-minimized sidebar .add-folder-top { opacity: 0; pointer-events: none; height: 0; padding: 0; margin: 0; border: none; }
+
+        .sidebar-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+        }
+
+        body.sidebar-minimized sidebar .sidebar-sections { overflow-y: hidden; }
+
+        .sidebar-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.4rem;
+            padding-left: 4px;
+        }
+        body.sidebar-minimized sidebar .sidebar-section-title { display: none; }
+
+        .folder-list { 
+            list-style: none; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.35rem; 
+            width: 100%;
+        }
+
+        .folder-item {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .folder-item:hover {
+            background: var(--glass-bg-hover);
+            color: var(--text-color);
+            border-color: var(--glass-border);
+        }
+
+        .folder-item.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .folder-left { display: flex; align-items: center; gap: 10px; overflow: hidden; white-space: nowrap; flex: 1; pointer-events: none; }
+        .folder-right { display: flex; align-items: center; gap: 6px; }
+
+        body.sidebar-minimized sidebar .folder-left span:last-child,
+        body.sidebar-minimized sidebar .folder-right,
+        body.sidebar-minimized sidebar .sidebar-notes-box,
+        body.sidebar-minimized sidebar .sidebar-social-footer { display: none; }
+
+        body.sidebar-minimized sidebar .folder-left { justify-content: center; width: 100%; }
+        body.sidebar-minimized sidebar .folder-item { justify-content: center; padding: 10px 0; }
+
+        .folder-count { 
+            background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid var(--glass-border); 
+            padding: 2px 7px; 
+            border-radius: 20px; 
+            font-size: 0.7rem; 
+            color: var(--accent-color); 
+            font-weight: 700; 
+            pointer-events: none;
+        }
+
+        .menu-dots-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .menu-dots-btn:hover { color: var(--text-color); background: rgba(255,255,255,0.15); }
+
+        .folder-dropdown-menu, .card-dropdown-menu {
+            display: none;
+            position: fixed;
+            background: var(--select-option-bg);
+            border: 1px solid var(--glass-border-light);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            z-index: 99999;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(30px);
+            min-width: 170px;
+        }
+        .folder-dropdown-menu.show, .card-dropdown-menu.show { display: flex; flex-direction: column; gap: 4px; }
+
+        .dropdown-item {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .dropdown-item:hover { background: var(--glass-bg-hover); }
+        .dropdown-item.danger:hover { background: rgba(244, 63, 94, 0.15); color: var(--danger-color); }
+
+        /* BLOC DE NOTES RAPIDES */
+        .sidebar-notes-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 5px;
+        }
+        .sidebar-notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .sidebar-notes-textarea {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 0.82rem;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+            line-height: 1.4;
+            font-family: inherit;
+        }
+        .sidebar-notes-textarea::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+        /* BARRE DE RÉSEAUX SOCIAUX EN BAS DE SIDEBAR AVEC LOGOS SVG */
+        .sidebar-social-footer {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .social-icon-link {
+            width: 38px;
+            height: 38px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(15px);
+        }
+
+        .social-icon-link svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            transition: fill 0.2s;
+        }
+
+        .social-icon-link:hover {
+            background: var(--glass-bg-hover);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .glass-input, .glass-select {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            color: var(--text-color);
+            font-size: 0.88rem;
+            outline: none;
+            backdrop-filter: blur(20px);
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .glass-select option {
+            background-color: var(--select-option-bg) !important;
+            color: var(--select-option-color) !important;
+            padding: 10px;
+        }
+        .glass-input:focus, .glass-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-glow);
+            background: var(--glass-bg-hover);
+        }
+
+        .search-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(40px) saturate(210%);
+            -webkit-backdrop-filter: blur(40px) saturate(210%);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .search-card:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 25px var(--accent-glow), var(--card-shadow);
+            background: var(--glass-bg-hover);
+        }
+        .search-icon { font-size: 1rem; color: var(--text-muted); user-select: none; display: flex; align-items: center; }
+        .search-input {
+            flex: 1;
+            border: none !important;
+            background: transparent !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: var(--text-color);
+            font-size: 0.92rem;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+        .search-input::placeholder { color: var(--text-muted); opacity: 0.7; }
+        .clear-search-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .clear-search-btn:hover { background: rgba(255, 255, 255, 0.25); color: var(--text-color); }
+        .keyboard-shortcut {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .main-wrapper { 
+         flex: 1; 
+         padding: 1.25rem; 
+         overflow-y: auto; 
+         overflow-x: hidden; 
+         height: 100vh; 
+         z-index: 1; 
+        -webkit-overflow-scrolling: touch;
+}
+        
+        .container { max-width: 1800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; width: 100%; }
+        
+        .top-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        header h1 { font-size: 2.2rem; font-weight: 800; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
+        header p { color: var(--text-muted); font-size: 0.88rem; font-weight: 500; }
+
+        .header-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .category-card { padding: 1.4rem; }
+        .category-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 1.4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+        .category-controls { display: flex; align-items: center; gap: 12px; }
+
+        .columns-container {
+            display: grid;
+            grid-template-columns: repeat(var(--columns-count), minmax(0, 1fr));
+            gap: 1.2rem;
+            align-items: start;
+            width: 100%;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .columns-container.switching { opacity: 0; transform: translateY(-8px); }
+
+        .item-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            word-break: break-word;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(30px);
+            opacity: 0;
+            transform: translate3d(0, 15px, 0);
+            animation: liquidCardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+
+        @keyframes liquidCardFadeIn { to { opacity: 1; transform: translate3d(0, 0, 0); } }
+
+        .item-card:hover {
+            background: var(--glass-bg-hover);
+            transform: translate3d(0, -5px, 0) scale(1.01);
+            border-color: var(--glass-border-light);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 25px var(--accent-glow);
+        }
+
+        .item-header { display: flex; align-items: flex-start; gap: 12px; min-width: 0; padding-right: 50px; }
+        
+        .item-icon-wrapper {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+        .item-icon-wrapper img { width: 24px; height: 24px; object-fit: contain; }
+        .item-card:hover .item-icon-wrapper {
+            transform: scale(1.08) rotate(3deg);
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .item-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+        .item-title { font-weight: 700; font-size: 0.95rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-url-text { font-size: 0.78rem; color: var(--accent-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; font-weight: 500; }
+        .item-desc { font-size: 0.8rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+
+        .item-top-actions { position: absolute; top: 14px; right: 14px; display: flex; align-items: center; gap: 4px; }
+        .star-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            padding: 4px;
+            line-height: 1;
+            transition: transform 0.2s, color 0.2s;
+        }
+        .star-btn:hover { transform: scale(1.2); }
+        .star-btn.active { color: var(--star-color); text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+
+        .item-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            gap: 6px;
+        }
+        .item-badge {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-color);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-color); }
+        
+        .modal-form-group { display: flex; flex-direction: column; gap: 6px; }
+        .modal-form-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 0.8rem; }
+
+        .preview-modal-card {
+            width: 90vw;
+            height: 85vh;
+            max-width: 1400px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: var(--radius-md);
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body class="">
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- SIDEBAR ESPACE DE TRAVAIL & NOTES -->
+    <sidebar class="glass-panel" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">
+                <span>⚡ WORKSPACE OSINT</span>
+            </div>
+            <button class="btn-glass toggle-btn-sidebar" id="sidebar-toggle-btn" title="Réduire / Agrandir">◀</button>
+        </div>
+
+        <button class="btn-glass add-folder-top" onclick="promptAddFolder()">+ Nouvelle catégorie</button>
+
+        <div class="sidebar-sections">
+            <!-- Vues globales -->
+            <div>
+                <div class="sidebar-section-title">Navigation</div>
+                <ul class="folder-list" id="global-nav-list"><li class="folder-item active">
+                <div class="folder-left"><span>📂</span><span>Tous les éléments</span></div>
+                <div class="folder-right"><span class="folder-count">16</span></div>
+            </li><li class="folder-item ">
+                <div class="folder-left"><span style="color: var(--star-color);">⭐</span><span>Favoris</span></div>
+                <div class="folder-right"><span class="folder-count" style="color: var(--star-color); border-color: rgba(245, 158, 11, 0.3);">4</span></div>
+            </li></ul>
+            </div>
+
+            <!-- Catégories dynamiques -->
+            <div>
+                <div class="sidebar-section-title">Catégories &amp; Dossiers</div>
+                <ul class="folder-list" id="folder-list"><li class="folder-item ">
+                    <div class="folder-left"><span>🧰</span><span>Outils et utilitaires</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">1</span>
+                        <button class="menu-dots-btn" onclick="toggleFolderMenu(event, 0)">⋮</button>
+                    </div>
+                </li><li class="folder-item ">
+                    <div class="folder-left"><span>🤖</span><span>IA &amp; Outils</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">2</span>
+                        <button class="menu-dots-btn" onclick="toggleFolderMenu(event, 1)">⋮</button>
+                    </div>
+                </li><li class="folder-item ">
+                    <div class="folder-left"><span>🕵️</span><span>OSINT</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">11</span>
+                        <button class="menu-dots-btn" onclick="toggleFolderMenu(event, 2)">⋮</button>
+                    </div>
+                </li><li class="folder-item ">
+                    <div class="folder-left"><span>📡</span><span>Réseaux &amp; IP</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">2</span>
+                        <button class="menu-dots-btn" onclick="toggleFolderMenu(event, 3)">⋮</button>
+                    </div>
+                </li></ul>
+            </div>
+
+            <!-- Bloc Notes / Dashboard cible persistant -->
+            <div class="sidebar-notes-box">
+                <div class="sidebar-notes-header">
+                    <span>📝 Notes Cible</span>
+                    <button class="btn-glass" style="padding: 1px 6px; font-size: 0.65rem;" onclick="clearNotes()">Effacer</button>
+                </div>
+                <textarea id="target-notes" class="sidebar-notes-textarea" placeholder="Notez ici les pseudos, emails, IP ou faits trouvés sur la cible..." oninput="saveNotes()"></textarea>
+            </div>
+        </div>
+
+        <!-- BARRE DE RÉSEAUX SOCIAUX EN BAS DE LA SIDEBAR AVEC LOGOS SVG -->
+        <div class="sidebar-social-footer">
+            <a href="https://github.com" target="_blank" class="social-icon-link" title="GitHub">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
+            </a>
+            <a href="https://discord.com" target="_blank" class="social-icon-link" title="Discord">
+                <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path></svg>
+            </a>
+            <a href="https://twitter.com" target="_blank" class="social-icon-link" title="X (Twitter)">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+            </a>
+            <a href="https://web.telegram.org" target="_blank" class="social-icon-link" title="Telegram">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.693-1.653-1.124-2.678-1.8-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635.099-.002.321.023.465.141.119.098.152.228.163.33.016.116.033.378.017.585z"></path></svg>
+            </a>
+        </div>
+    </sidebar>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="main-wrapper">
+        <div class="container">
+            
+            <div class="top-header">
+                <header>
+                    <h1>OSINT &amp; Social Workspace</h1>
+                    <p>Plateforme d'investigation, réseaux sociaux et centralisation d'indices</p>
+                </header>
+                <div class="header-controls">
+                    <button class="btn-glass btn-primary" onclick="openAddModal()">➕ Nouveau site</button>
+                    <button class="btn-glass" onclick="exportHTML()" style="border-color: var(--accent-color); color: var(--accent-color);">💾 Sauvegarder</button>
+                    <button class="btn-glass" onclick="toggleTheme()" id="theme-btn">☀️ Mode</button>
+                </div>
+            </div>
+
+            <!-- BARRE DE RECHERCHE -->
+            <div class="glass-panel search-card">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-bar" class="search-input" placeholder="Rechercher une ressource, un réseau social, un outil..." oninput="handleSearch()">
+                <button id="clear-search" class="clear-search-btn" onclick="clearSearch()" title="Effacer">✕</button>
+                <span class="keyboard-shortcut">⌘ K</span>
+            </div>
+
+            <!-- CONTENEUR DES CARTES -->
+            <div class="glass-panel category-card">
+                <div class="category-title">
+                    <span id="current-folder-title">📂 Tous les éléments</span>
+                    <div class="category-controls">
+                        <select id="column-select" class="glass-select" style="width: 130px;" onchange="changeColumns(this.value)">
+                            <option value="5">5 Colonnes</option>
+                            <option value="4">4 Colonnes</option>
+                            <option value="3" selected="">3 Colonnes</option>
+                            <option value="2">2 Colonnes</option>
+                            <option value="1">1 Colonne</option>
+                        </select>
+                        <button class="btn-glass btn-danger" style="font-size: 0.75rem;" onclick="resetAll()">Réinitialiser</button>
+                    </div>
+                </div>
+
+                <div class="columns-container" id="cards-container"><div class="item-card" style="animation-delay: 0s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(100, event)" title="Retirer des favoris">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 100)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <span>📒</span>
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Carnet d'adresses Cible</div>
+                            <a href="#" target="_self" class="item-url-text">utilitaire.local</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Gestionnaire et carnet d'adresses centralisé pour profils cibles.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">Outils et utilitaires</span>
+                        <button class="btn-glass btn-primary" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openContactModal()">Créer un contact ➕</button>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.02s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(1, event)" title="Retirer des favoris">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 1)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=venice.ai&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Venice AI Agent</div>
+                            <a href="https://venice.ai" target="_blank" class="item-url-text">venice.ai</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Agent IA axé sur la confidentialité.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">IA &amp; Outils</span>
+                        <a href="https://venice.ai" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.04s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(2, event)" title="Retirer des favoris">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 2)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=whatsmyname.me&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">WhatsMyName.me</div>
+                            <a href="https://whatsmyname.me" target="_blank" class="item-url-text">whatsmyname.me</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Vérification de pseudos.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://whatsmyname.me" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.06s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(3, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 3)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=whatsmyname.app&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">WhatsMyName Web</div>
+                            <a href="https://whatsmyname.app" target="_blank" class="item-url-text">whatsmyname.app</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Version web de WhatsMyName.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://whatsmyname.app" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.08s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(4, event)" title="Retirer des favoris">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 4)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=osintframework.com&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">OSINT Framework</div>
+                            <a href="https://osintframework.com" target="_blank" class="item-url-text">osintframework.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Arborescence interactive de ressources d'investigation.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://osintframework.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.1s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(5, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 5)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=shodan.io&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Shodan IP</div>
+                            <a href="https://shodan.io" target="_blank" class="item-url-text">shodan.io</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Moteur de recherche pour appareils connectés.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">Réseaux &amp; IP</span>
+                        <a href="https://shodan.io" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.12s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(6, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 6)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=github.com&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">GitHub Tout-osint</div>
+                            <a href="https://github.com" target="_blank" class="item-url-text">github.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Dépôts et outils OSINT sur GitHub.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://github.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.14s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(7, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 7)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=venice.ai&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Venice IA Uncensored</div>
+                            <a href="https://venice.ai/chat/classic/B8B304v" target="_blank" class="item-url-text">venice.ai</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Modèle IA sans censure.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">IA &amp; Outils</span>
+                        <a href="https://venice.ai/chat/classic/B8B304v" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.16s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(8, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 8)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=osintfr.com&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Outils OSINT</div>
+                            <a href="https://osintfr.com" target="_blank" class="item-url-text">osintfr.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Ressources et outils d'investigation francophones.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://osintfr.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.18s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(9, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 9)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=oathnet.org&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">OathNet Intelligence</div>
+                            <a href="https://oathnet.org" target="_blank" class="item-url-text">oathnet.org</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Plateforme de renseignement et OSINT.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://oathnet.org" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(10, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 10)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=see-know.xyz&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">SeekNow Platform</div>
+                            <a href="https://see-know.xyz" target="_blank" class="item-url-text">see-know.xyz</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Recherche et indexation d'indices.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://see-know.xyz" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(11, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 11)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=kerbes.org&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Kerbes OSINT</div>
+                            <a href="https://kerbes.org" target="_blank" class="item-url-text">kerbes.org</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Outils et liens d'investigation.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://kerbes.org" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(12, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 12)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=brixhub.to&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">BrixHub</div>
+                            <a href="https://brixhub.to" target="_blank" class="item-url-text">brixhub.to</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Plateforme de ressources et liens utiles.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://brixhub.to" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(13, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 13)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=stryxx.net&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Stryxx</div>
+                            <a href="https://stryxx.net" target="_blank" class="item-url-text">stryxx.net</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Outil de recherche et d'investigation.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://stryxx.net" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(14, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 14)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=trouver-ip.com&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Localiser IP</div>
+                            <a href="https://trouver-ip.com" target="_blank" class="item-url-text">trouver-ip.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Outil de géolocalisation d'adresses IP.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">Réseaux &amp; IP</span>
+                        <a href="https://trouver-ip.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(15, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 15)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=github.io&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Marine Data</div>
+                            <a href="https://github.io" target="_blank" class="item-url-text">github.io</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Données maritimes et traçage.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://github.io" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALE : AJOUTER / ÉDITER UN LIEN -->
+    <div class="modal-overlay" id="add-modal" onclick="closeModalOnOverlay(event)">
+        <div class="glass-panel modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title-text">Modifier la ressource</h3>
+                <button class="btn-glass" style="padding: 4px 10px;" onclick="closeModal()">✕</button>
+            </div>
+            
+            <input type="hidden" id="editing-link-id" value="">
+
+            <div class="modal-form-group">
+                <label for="new-link-title">Nom de la ressource</label>
+                <input type="text" id="new-link-title" class="glass-input" placeholder="ex: X (Twitter) / LinkedIn">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-url">Lien / URL</label>
+                <input type="text" id="new-link-url" class="glass-input" placeholder="ex: https://linkedin.com">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-icon">Icône personnalisée (Emoji ou URL d'image)</label>
+                <input type="text" id="new-link-icon" class="glass-input" placeholder="ex: 💼 ou https://...">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-desc">Description (optionnelle)</label>
+                <input type="text" id="new-link-desc" class="glass-input" placeholder="Description de l'outil ou profil cible...">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-folder">Catégorie / Dossier</label>
+                <select id="new-link-folder" class="glass-select">
+                    <!-- Options injectées par JS -->
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-glass" onclick="closeModal()">Annuler</button>
+                <button class="btn-glass btn-primary" onclick="saveLink()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE : CRÉER UN CONTACT (CARNET D'ADRESSES OSINT) -->
+    <div class="modal-overlay" id="contact-modal" onclick="closeContactModalOnOverlay(event)">
+        <div class="glass-panel modal-card">
+            <div class="modal-header">
+                <h3>🧰 Nouveau Contact / Cible</h3>
+                <button class="btn-glass" style="padding: 4px 10px;" onclick="closeContactModal()">✕</button>
+            </div>
+            
+            <div class="modal-form-group">
+                <label>Nom</label>
+                <input type="text" id="contact-nom" class="glass-input" placeholder="Nom de famille">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Prénom</label>
+                <input type="text" id="contact-prenom" class="glass-input" placeholder="Prénom">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Téléphone</label>
+                <input type="text" id="contact-telephone" class="glass-input" placeholder="ex: +33600000000">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Travail / Profession</label>
+                <input type="text" id="contact-travail" class="glass-input" placeholder="Entreprise ou poste">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Adresse IP</label>
+                <input type="text" id="contact-ip" class="glass-input" placeholder="ex: 192.168.1.1">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Adresse postale</label>
+                <input type="text" id="contact-adresse" class="glass-input" placeholder="Rue, numéro...">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Code postal</label>
+                <input type="text" id="contact-codepostaler" class="glass-input" placeholder="ex: 75001">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Date de naissance</label>
+                <input type="date" id="contact-dae" class="glass-input">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Immatriculation</label>
+                <input type="text" id="contact-immatriculation" class="glass-input" placeholder="ex: AB-123-CD">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-glass" onclick="closeContactModal()">Annuler</button>
+                <button class="btn-glass btn-primary" onclick="saveContact()">Ajouter au carnet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE : APERÇU / PREVIEW DE SITE -->
+    <div class="modal-overlay" id="preview-modal" onclick="closePreviewOnOverlay(event)">
+        <div class="glass-panel preview-modal-card">
+            <div class="modal-header">
+                <h3 id="preview-title">Aperçu du site</h3>
+                <button class="btn-glass" style="padding: 4px 10px;" onclick="closePreviewModal()">✕</button>
+            </div>
+            <iframe id="preview-frame" class="preview-iframe" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <!-- DONNÉES EMBARQUÉES -->
+    <script id="embedded-data">
+        window.INITIAL_FOLDERS = [
+          {
+                    "name": "Outils et utilitaires",
+                    "icon": "🧰"
+          },
+          {
+                    "name": "IA & Outils",
+                    "icon": "🤖"
+          },
+          {
+                    "name": "OSINT",
+                    "icon": "🕵️"
+          },
+          {
+                    "name": "Réseaux & IP",
+                    "icon": "📡"
+          }
+];
+        window.INITIAL_LINKS = [
+          {
+                    "id": 100,
+                    "title": "Carnet d'adresses Cible",
+                    "url": "#",
+                    "domain": "utilitaire.local",
+                    "description": "Gestionnaire et carnet d'adresses centralisé pour profils cibles.",
+                    "category": "Outils et utilitaires",
+                    "favorite": true,
+                    "customIcon": "📒",
+                    "isContactTool": true
+          },
+          {
+                    "id": 1,
+                    "title": "Venice AI Agent",
+                    "url": "https://venice.ai",
+                    "domain": "venice.ai",
+                    "description": "Agent IA axé sur la confidentialité.",
+                    "category": "IA & Outils",
+                    "favorite": true,
+                    "customIcon": ""
+          },
+          {
+                    "id": 2,
+                    "title": "WhatsMyName.me",
+                    "url": "https://whatsmyname.me",
+                    "domain": "whatsmyname.me",
+                    "description": "Vérification de pseudos.",
+                    "category": "OSINT",
+                    "favorite": true,
+                    "customIcon": ""
+          },
+          {
+                    "id": 3,
+                    "title": "WhatsMyName Web",
+                    "url": "https://whatsmyname.app",
+                    "domain": "whatsmyname.app",
+                    "description": "Version web de WhatsMyName.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 4,
+                    "title": "OSINT Framework",
+                    "url": "https://osintframework.com",
+                    "domain": "osintframework.com",
+                    "description": "Arborescence interactive de ressources d'investigation.",
+                    "category": "OSINT",
+                    "favorite": true,
+                    "customIcon": ""
+          },
+          {
+                    "id": 5,
+                    "title": "Shodan IP",
+                    "url": "https://shodan.io",
+                    "domain": "shodan.io",
+                    "description": "Moteur de recherche pour appareils connectés.",
+                    "category": "Réseaux & IP",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 6,
+                    "title": "GitHub Tout-osint",
+                    "url": "https://github.com",
+                    "domain": "github.com",
+                    "description": "Dépôts et outils OSINT sur GitHub.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 7,
+                    "title": "Venice IA Uncensored",
+                    "url": "https://venice.ai/chat/classic/B8B304v",
+                    "domain": "venice.ai",
+                    "description": "Modèle IA sans censure.",
+                    "category": "IA & Outils",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 8,
+                    "title": "Outils OSINT",
+                    "url": "https://osintfr.com",
+                    "domain": "osintfr.com",
+                    "description": "Ressources et outils d'investigation francophones.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 9,
+                    "title": "OathNet Intelligence",
+                    "url": "https://oathnet.org",
+                    "domain": "oathnet.org",
+                    "description": "Plateforme de renseignement et OSINT.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 10,
+                    "title": "SeekNow Platform",
+                    "url": "https://see-know.xyz",
+                    "domain": "see-know.xyz",
+                    "description": "Recherche et indexation d'indices.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 11,
+                    "title": "Kerbes OSINT",
+                    "url": "https://kerbes.org",
+                    "domain": "kerbes.org",
+                    "description": "Outils et liens d'investigation.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 12,
+                    "title": "BrixHub",
+                    "url": "https://brixhub.to",
+                    "domain": "brixhub.to",
+                    "description": "Plateforme de ressources et liens utiles.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 13,
+                    "title": "Stryxx",
+                    "url": "https://stryxx.net",
+                    "domain": "stryxx.net",
+                    "description": "Outil de recherche et d'investigation.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 14,
+                    "title": "Localiser IP",
+                    "url": "https://trouver-ip.com",
+                    "domain": "trouver-ip.com",
+                    "description": "Outil de géolocalisation d'adresses IP.",
+                    "category": "Réseaux & IP",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 15,
+                    "title": "Marine Data",
+                    "url": "https://github.io",
+                    "domain": "github.io",
+                    "description": "Données maritimes et traçage.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          }
+];
+        window.TARGET_NOTES_DATA = "";
+    </script>
+
+    <script>
+        let folders = window.INITIAL_FOLDERS;
+        let linksData = window.INITIAL_LINKS;
+        let activeFolder = 'all';
+        let searchQuery = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('sidebar-toggle-btn');
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            }
+
+            if (window.TARGET_NOTES_DATA) {
+                document.getElementById('target-notes').value = window.TARGET_NOTES_DATA;
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('search-bar').focus();
+                }
+                if (e.key === 'Escape') {
+                    closeModal();
+                    closeContactModal();
+                    closePreviewModal();
+                    closeAllMenus();
+                }
+            });
+
+            renderFolders();
+            renderCards();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.menu-dots-btn') && !e.target.closest('.folder-dropdown-menu') && !e.target.closest('.card-dropdown-menu')) {
+                closeAllMenus();
+            }
+        });
+
+        function closeAllMenus() {
+            document.querySelectorAll('.folder-dropdown-menu, .card-dropdown-menu').forEach(m => m.classList.remove('show'));
+        }
+
+        function toggleSidebar() {
+            closeAllMenus();
+            const body = document.body;
+            const btn = document.getElementById('sidebar-toggle-btn');
+            const isMinimized = body.classList.toggle('sidebar-minimized');
+            btn.innerHTML = isMinimized ? '▶' : '◀';
+        }
+
+        function saveNotes() {
+            window.TARGET_NOTES_DATA = document.getElementById('target-notes').value;
+        }
+
+        function clearNotes() {
+            if (confirm("Voulez-vous effacer toutes les notes de la cible ?")) {
+                document.getElementById('target-notes').value = '';
+                window.TARGET_NOTES_DATA = '';
+            }
+        }
+
+        function openAddModal() {
+            if (folders.length === 0) {
+                alert("Veuillez d'abord créer au moins une catégorie dans la barre latérale.");
+                return;
+            }
+
+            document.getElementById('editing-link-id').value = '';
+            document.getElementById('modal-title-text').innerText = "Ajouter un site";
+            document.getElementById('new-link-title').value = '';
+            document.getElementById('new-link-url').value = '';
+            document.getElementById('new-link-icon').value = '';
+            document.getElementById('new-link-desc').value = '';
+            
+            updateCategorySelectOptions();
+            document.getElementById('add-modal').classList.add('open');
+        }
+
+        function openEditModal(id) {
+            closeAllMenus();
+            const item = linksData.find(l => l.id === id);
+            if (!item) return;
+
+            document.getElementById('editing-link-id').value = item.id;
+            document.getElementById('modal-title-text').innerText = "Modifier la ressource";
+            document.getElementById('new-link-title').value = item.title;
+            document.getElementById('new-link-url').value = item.url;
+            document.getElementById('new-link-icon').value = item.customIcon || '';
+            document.getElementById('new-link-desc').value = item.description || '';
+            
+            updateCategorySelectOptions(item.category);
+            document.getElementById('add-modal').classList.add('open');
+        }
+
+        function updateCategorySelectOptions(selectedCat = '') {
+            const selectFolderElem = document.getElementById('new-link-folder');
+            selectFolderElem.innerHTML = '';
+            folders.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.name;
+                opt.innerText = `${f.icon || '📁'} ${f.name}`;
+                selectFolderElem.appendChild(opt);
+            });
+            if (selectedCat && folders.some(f => f.name === selectedCat)) {
+                selectFolderElem.value = selectedCat;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').classList.remove('open');
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target.id === 'add-modal') closeModal();
+        }
+
+        function openContactModal() {
+            document.getElementById('contact-nom').value = '';
+            document.getElementById('contact-prenom').value = '';
+            document.getElementById('contact-telephone').value = '';
+            document.getElementById('contact-travail').value = '';
+            document.getElementById('contact-ip').value = '';
+            document.getElementById('contact-adresse').value = '';
+            document.getElementById('contact-codepostaler').value = '';
+            document.getElementById('contact-dae').value = '';
+            document.getElementById('contact-immatriculation').value = '';
+            document.getElementById('contact-modal').classList.add('open');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contact-modal').classList.remove('open');
+        }
+
+        function closeContactModalOnOverlay(e) {
+            if (e.target.id === 'contact-modal') closeContactModal();
+        }
+
+        function saveContact() {
+            const nom = document.getElementById('contact-nom').value.trim();
+            const prenom = document.getElementById('contact-prenom').value.trim();
+            const tel = document.getElementById('contact-telephone').value.trim();
+            const travail = document.getElementById('contact-travail').value.trim();
+            const ip = document.getElementById('contact-ip').value.trim();
+            const adresse = document.getElementById('contact-adresse').value.trim();
+            const cp = document.getElementById('contact-codepostaler').value.trim();
+            const dae = document.getElementById('contact-dae').value.trim();
+            const immat = document.getElementById('contact-immatriculation').value.trim();
+
+            if (!nom && !prenom) {
+                alert("Veuillez renseigner au moins un nom ou un prénom.");
+                return;
+            }
+
+            const fullName = `${prenom} ${nom}`.trim();
+            let descParts = [];
+            if (tel) descParts.push(`Tél: ${tel}`);
+            if (travail) descParts.push(`Travail: ${travail}`);
+            if (ip) descParts.push(`IP: ${ip}`);
+            if (adresse || cp) descParts.push(`Adresse: ${adresse} (${cp})`);
+            if (dae) descParts.push(`Né(e) le: ${dae}`);
+            if (immat) descParts.push(`Immat: ${immat}`);
+
+            let targetCategory = folders[0] ? folders[0].name : "Outils et utilitaires";
+            if (!folders.some(f => f.name === targetCategory)) {
+                folders.push({ name: targetCategory, icon: "🧰" });
+            }
+
+            linksData.push({
+                id: Date.now(),
+                title: fullName,
+                url: "#",
+                domain: "contact.local",
+                description: descParts.join(" | ") || "Contact enregistré",
+                category: targetCategory,
+                favorite: false,
+                customIcon: "👤"
+            });
+
+            closeContactModal();
+            renderFolders();
+            renderCards();
+        }
+
+        function openPreviewModal(url, title) {
+            closeAllMenus();
+            if (url === '#') {
+                alert("Cet élément est un outil interne (Carnet d'adresses).");
+                return;
+            }
+            document.getElementById('preview-title').innerText = title;
+            document.getElementById('preview-frame').src = url;
+            document.getElementById('preview-modal').classList.add('open');
+        }
+
+        function closePreviewModal() {
+            document.getElementById('preview-modal').classList.remove('open');
+            document.getElementById('preview-frame').src = 'about:blank';
+        }
+
+        function closePreviewOnOverlay(e) {
+            if (e.target.id === 'preview-modal') closePreviewModal();
+        }
+
+        function toggleFavorite(id, event) {
+            if (event) event.stopPropagation();
+            const item = linksData.find(l => l.id === id);
+            if (item) {
+                item.favorite = !item.favorite;
+                renderFolders();
+                renderCards();
+            }
+        }
+
+        function changeCardIcon(id, event) {
+            if (event) event.stopPropagation();
+            closeAllMenus();
+            const item = linksData.find(l => l.id === id);
+            if (!item) return;
+
+            setTimeout(() => {
+                const current = item.customIcon || '';
+                const newIcon = prompt("Entrez une icône (Emoji ou URL complète de l'image) :\nLaissez vide pour utiliser le favicon automatique.", current);
+                if (newIcon !== null) {
+                    item.customIcon = newIcon.trim();
+                    renderCards();
+                }
+            }, 50);
+        }
+
+        function renderFolders() {
+            const globalNavList = document.getElementById('global-nav-list');
+            const folderList = document.getElementById('folder-list');
+            
+            globalNavList.innerHTML = '';
+            folderList.innerHTML = '';
+
+            const liAll = document.createElement('li');
+            liAll.className = `folder-item ${activeFolder === 'all' ? 'active' : ''}`;
+            liAll.onclick = () => selectFolder('all');
+            liAll.innerHTML = `
+                <div class="folder-left"><span>📂</span><span>Tous les éléments</span></div>
+                <div class="folder-right"><span class="folder-count">${linksData.length}</span></div>
+            `;
+            globalNavList.appendChild(liAll);
+
+            const favCount = linksData.filter(l => l.favorite).length;
+            const liFav = document.createElement('li');
+            liFav.className = `folder-item ${activeFolder === 'favorites' ? 'active' : ''}`;
+            liFav.onclick = () => selectFolder('favorites');
+            liFav.innerHTML = `
+                <div class="folder-left"><span style="color: var(--star-color);">⭐</span><span>Favoris</span></div>
+                <div class="folder-right"><span class="folder-count" style="color: var(--star-color); border-color: rgba(245, 158, 11, 0.3);">${favCount}</span></div>
+            `;
+            globalNavList.appendChild(liFav);
+
+            folders.forEach((fObj, index) => {
+                const count = linksData.filter(item => item.category === fObj.name).length;
+                const li = document.createElement('li');
+                li.className = `folder-item ${activeFolder === fObj.name ? 'active' : ''}`;
+                li.onclick = () => selectFolder(fObj.name);
+
+                li.innerHTML = `
+                    <div class="folder-left"><span>${fObj.icon || '📁'}</span><span>${fObj.name}</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">${count}</span>
+                        <button class="menu-dots-btn" onclick="toggleFolderMenu(event, ${index})">⋮</button>
+                    </div>
+                `;
+                folderList.appendChild(li);
+            });
+        }
+
+        function selectFolder(category) {
+            if (activeFolder === category) return;
+
+            const container = document.getElementById('cards-container');
+            container.classList.add('switching');
+
+            setTimeout(() => {
+                activeFolder = category;
+                if (category === 'all') {
+                    document.getElementById('current-folder-title').innerText = '📂 Tous les éléments';
+                } else if (category === 'favorites') {
+                    document.getElementById('current-folder-title').innerText = '⭐ Favoris';
+                } else {
+                    const currentObj = folders.find(f => f.name === category);
+                    const icon = currentObj ? currentObj.icon : '📂';
+                    document.getElementById('current-folder-title').innerText = `${icon} ${category}`;
+                }
+                renderFolders();
+                renderCards();
+                container.classList.remove('switching');
+            }, 100);
+        }
+
+        function toggleFolderMenu(event, index) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAllMenus();
+
+            let targetMenu = document.getElementById(`folder-menu-global`);
+            if (!targetMenu) {
+                targetMenu = document.createElement('div');
+                targetMenu.id = 'folder-menu-global';
+                targetMenu.className = 'folder-dropdown-menu';
+                document.body.appendChild(targetMenu);
+            }
+
+            targetMenu.innerHTML = `
+                <button class="dropdown-item" onclick="changeFolderIcon(event, ${index})">🎨 Changer l'icône</button>
+                <button class="dropdown-item" onclick="renameFolder(event, ${index})">✏️ Renommer</button>
+                <button class="dropdown-item danger" onclick="deleteFolder(event, ${index})">🗑️ Supprimer</button>
+            `;
+
+            const rect = event.currentTarget.getBoundingClientRect();
+            targetMenu.style.top = `${rect.bottom + 6}px`;
+            targetMenu.style.left = `${rect.left - 130}px`;
+            targetMenu.classList.add('show');
+        }
+
+        function toggleCardMenu(event, id) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAllMenus();
+
+            const item = linksData.find(l => l.id === id);
+            if (!item) return;
+
+            let targetMenu = document.getElementById(`card-menu-global`);
+            if (!targetMenu) {
+                targetMenu = document.createElement('div');
+                targetMenu.id = 'card-menu-global';
+                targetMenu.className = 'card-dropdown-menu';
+                document.body.appendChild(targetMenu);
+            }
+
+            let previewAction = item.url !== '#' ? `<button class="dropdown-item" onclick="openPreviewModal('${item.url}', '${item.title.replace(/'/g, "\\'")}')">👁️ Aperçu</button>` : '';
+
+            targetMenu.innerHTML = `
+                ${previewAction}
+                <button class="dropdown-item" onclick="openEditModal(${item.id})">✏️ Modifier</button>
+                <button class="dropdown-item" onclick="changeCardIcon(${item.id}, event)">🎨 Changer l'icône</button>
+                <button class="dropdown-item danger" onclick="deleteLink(${item.id})">🗑️ Supprimer</button>
+            `;
+
+            const rect = event.currentTarget.getBoundingClientRect();
+            targetMenu.style.top = `${rect.bottom + 6}px`;
+            targetMenu.style.left = `${rect.left - 130}px`;
+            targetMenu.classList.add('show');
+        }
+
+        function changeFolderIcon(event, index) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAllMenus();
+            
+            setTimeout(() => {
+                const currentIcon = folders[index].icon || '📁';
+                const newIcon = prompt('Entrez une nouvelle icône (emoji) :', currentIcon);
+                if (newIcon && newIcon.trim() !== '') {
+                    folders[index].icon = newIcon.trim();
+                    renderFolders();
+                    renderCards();
+                }
+            }, 50);
+        }
+
+        function renameFolder(event, index) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAllMenus();
+            
+            setTimeout(() => {
+                const oldName = folders[index].name;
+                const newName = prompt('Nouveau nom de la catégorie :', oldName);
+                if (newName && newName.trim() !== '' && !folders.some(f => f.name === newName.trim())) {
+                    const name = newName.trim();
+                    folders[index].name = name;
+
+                    linksData.forEach(item => {
+                        if (item.category === oldName) item.category = name;
+                    });
+
+                    if (activeFolder === oldName) activeFolder = name;
+                    renderFolders();
+                    renderCards();
+                }
+            }, 50);
+        }
+
+        function deleteFolder(event, index) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAllMenus();
+            
+            setTimeout(() => {
+                const folderName = folders[index].name;
+                if (confirm(`Supprimer la catégorie "${folderName}" et ses liens associés ?`)) {
+                    folders.splice(index, 1);
+                    linksData = linksData.filter(item => item.category !== folderName);
+                    if (activeFolder === folderName) activeFolder = 'all';
+                    renderFolders();
+                    renderCards();
+                }
+            }, 50);
+        }
+
+        function handleSearch() {
+            const input = document.getElementById('search-bar');
+            const clearBtn = document.getElementById('clear-search');
+            
+            searchQuery = input.value.toLowerCase().trim();
+            
+            if (input.value.length > 0) {
+                clearBtn.style.display = 'flex';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+            
+            renderCards();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('search-bar');
+            input.value = '';
+            handleSearch();
+            input.focus();
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            let filtered = [];
+            if (activeFolder === 'all') {
+                filtered = linksData;
+            } else if (activeFolder === 'favorites') {
+                filtered = linksData.filter(item => item.favorite);
+            } else {
+                filtered = linksData.filter(item => item.category === activeFolder);
+            }
+
+            if (searchQuery) {
+                filtered = filtered.filter(item => 
+                    item.title.toLowerCase().includes(searchQuery) ||
+                    item.url.toLowerCase().includes(searchQuery) ||
+                    (item.description && item.description.toLowerCase().includes(searchQuery))
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3.5rem;">Aucune ressource trouvée.</div>`;
+                return;
+            }
+
+            filtered.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.style.animationDelay = `${Math.min(index * 0.02, 0.2)}s`;
+                
+                const descHTML = item.description ? `<div class="item-desc">${item.description}</div>` : '';
+
+                let iconHTML = '';
+                if (item.customIcon) {
+                    if (item.customIcon.startsWith('http://') || item.customIcon.startsWith('https://')) {
+                        iconHTML = `<img src="${item.customIcon}" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">`;
+                    } else {
+                        iconHTML = `<span>${item.customIcon}</span>`;
+                    }
+                } else {
+                    const faviconUrl = `https://www.google.com/s2/favicons?domain=${item.domain}&sz=64`;
+                    iconHTML = `<img src="${faviconUrl}" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">`;
+                }
+
+                let actionBtnHTML = '';
+                if (item.isContactTool) {
+                    actionBtnHTML = `<button class="btn-glass btn-primary" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openContactModal()">Créer un contact ➕</button>`;
+                } else if (item.url !== '#') {
+                    actionBtnHTML = `<a href="${item.url}" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>`;
+                } else {
+                    actionBtnHTML = `<span class="item-badge" style="background:transparent; border:none; padding:0;">Interne</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="item-top-actions">
+                        <button class="star-btn ${item.favorite ? 'active' : ''}" onclick="toggleFavorite(${item.id}, event)" title="${item.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}">
+                            ${item.favorite ? '★' : '☆'}
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, ${item.id})">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            ${iconHTML}
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">${item.title}</div>
+                            <a href="${item.url}" target="${item.url === '#' ? '_self' : '_blank'}" class="item-url-text">${item.domain}</a>
+                        </div>
+                    </div>
+                    ${descHTML}
+                    <div class="item-footer">
+                        <span class="item-badge">${item.category}</span>
+                        ${actionBtnHTML}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function promptAddFolder() {
+            const folderName = prompt('Nom de la nouvelle catégorie :');
+            if (!folderName || !folderName.trim()) return;
+            const name = folderName.trim();
+            if (folders.some(f => f.name === name)) {
+                alert("Cette catégorie existe déjà.");
+                return;
+            }
+
+            const iconChoice = prompt('Choisissez une icône (emoji) pour cette catégorie :', '📁');
+            const icon = iconChoice && iconChoice.trim() ? iconChoice.trim() : '📁';
+
+            folders.push({ name: name, icon: icon });
+            renderFolders();
+        }
+
+        function saveLink() {
+            const idInput = document.getElementById('editing-link-id').value;
+            const titleInput = document.getElementById('new-link-title');
+            const urlInput = document.getElementById('new-link-url');
+            const iconInput = document.getElementById('new-link-icon');
+            const descInput = document.getElementById('new-link-desc');
+            const categorySelect = document.getElementById('new-link-folder');
+            
+            let url = urlInput.value.trim();
+            let title = titleInput.value.trim();
+            let desc = descInput.value.trim();
+            let customIcon = iconInput.value.trim();
+
+            if (!url) return;
+
+            if (url !== '#' && !url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+
+            let domain = url === '#' ? 'local.outil' : url.replace('https://', '').replace('http://', '').split('/')[0];
+            
+            if (!title) {
+                title = domain.charAt(0).toUpperCase() + domain.slice(1);
+            }
+
+            if (idInput) {
+                const item = linksData.find(l => l.id === parseInt(idInput));
+                if (item) {
+                    item.title = title;
+                    item.url = url;
+                    item.domain = domain;
+                    item.customIcon = customIcon;
+                    item.description = desc;
+                    item.category = categorySelect.value;
+                }
+            } else {
+                linksData.push({
+                    id: Date.now(),
+                    title: title,
+                    url: url,
+                    domain: domain,
+                    customIcon: customIcon,
+                    description: desc,
+                    category: categorySelect.value || (folders[0] ? folders[0].name : 'OSINT'),
+                    favorite: false
+                });
+            }
+
+            closeModal();
+            renderFolders();
+            renderCards();
+        }
+
+        function deleteLink(id) {
+            closeAllMenus();
+            linksData = linksData.filter(item => item.id !== id);
+            renderFolders();
+            renderCards();
+        }
+
+        function resetAll() {
+            if (confirm('Voulez-vous réinitialiser tous les dossiers et ressources ?')) {
+                linksData = [];
+                renderFolders();
+                renderCards();
+            }
+        }
+
+        function changeColumns(val) {
+            document.documentElement.style.setProperty('--columns-count', val);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        }
+
+        function exportHTML() {
+            let fullHTML = document.documentElement.outerHTML;
+
+            const notesContent = document.getElementById('target-notes').value;
+            const newDataScript = `<script id="embedded-data">\n        window.INITIAL_FOLDERS = ${JSON.stringify(folders, null, 12)};\n        window.INITIAL_LINKS = ${JSON.stringify(linksData, null, 12)};\n        window.TARGET_NOTES_DATA = ${JSON.stringify(notesContent)};\n    <\/script>`;
+
+            fullHTML = fullHTML.replace(/<script id="embedded-data">[\s\S]*?<\/script>/, newDataScript);
+
+            const blob = new Blob(["<!DOCTYPE html>\n<html lang=\"fr\" data-theme=\"" + document.documentElement.getAttribute('data-theme') + "\">\n" + fullHTML + "\n</html>"], { type: "text/html;charset=utf-8" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "index.html";
+            a.click();
+        }
+    </script>
+
+<div id="folder-menu-global" class="folder-dropdown-menu" style="top: 506.75px; left: 161px;">
+                <button class="dropdown-item" onclick="changeFolderIcon(event, 4)">🎨 Changer l'icône</button>
+                <button class="dropdown-item" onclick="renameFolder(event, 4)">✏️ Renommer</button>
+                <button class="dropdown-item danger" onclick="deleteFolder(event, 4)">🗑️ Supprimer</button>
+            </div></body></html>
+</html>
