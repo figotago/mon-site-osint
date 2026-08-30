@@ -32,4 +32,4 @@ La bêta tu prochain site est déjà disponible en HTLM
 - Modification "Carnet d'adresses Cible"
 - Ajout de note améliorer
 - Autre amélioration et d'ajout de fonctionalité
-( La version est disponible en bêta qui est la version 3.0
+(La version est disponible en bêta qui est la version 3.0)
