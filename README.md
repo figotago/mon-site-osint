@@ -27,7 +27,8 @@ La bêta tu prochain site est déjà disponible en HTLM
 
 ## 📌 À venir pour la v2.2
 - Correction de bug
-- Petite amélioration
+- ajout de nouveau site
+- -ajout de petite fonctionnalité
 
 ## ⚙️ À venir pour la grosse MAJ v3.0
 - Correction de bug
