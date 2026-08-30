@@ -4,16 +4,16 @@ Actuellement à sa version 2.1 que je poste pour la première fois en publique,
 ce site a été créé pour rassembler plusieurs outils d’OSINT simples et accessibles.  
 Il me permet d’apprendre, pratiquer et centraliser différentes méthodes de recherche d’informations publiques.
 
+## 🎯 Objectif du projet
+Je suis élève en seconde Bac Pro CIEL, et ce site me sert à pratiquer l’OSINT de manière légale et éducative.  
+Le but est d’avoir une plateforme personnelle pour tester des modules et progresser.
+
 ## 🔍 Outils disponibles
 - Analyse d’adresse IP (géolocalisation, ASN)
 - Recherche Whois / DNS
 - Vérification d’emails (sans requêtes intrusives)
 - Recherche de comptes via un pseudo
 - Extraction de métadonnées EXIF
-
-## 🎯 Objectif du projet
-Je suis élève en seconde Bac Pro CIEL, et ce site me sert à pratiquer l’OSINT de manière légale et éducative.  
-Le but est d’avoir une plateforme personnelle pour tester des modules et progresser.
 
 ## 🛠️ Technologies utilisées
 - HTML / CSS / JavaScript
