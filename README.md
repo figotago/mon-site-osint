@@ -25,12 +25,12 @@ Le site est hébergé via GitHub Pages.
 Il est accessible depuis l’onglet **Pages** du dépôt.
 La bêta tu prochain site est déjà disponible en HTLM
 
-## 📌 À venir pour la v2.2
+## 📌 À venir pour la MAJ v2.2
 - Correction de bug
 - ajout de nouveau site
 - -ajout de petite fonctionnalité
 
-## ⚙️ À venir pour la grosse MAJ v3.0
+## ⚙️ À venir pour la MAJ v3.0
 - Correction de bug
 - Changement d'interface
 - Ajout d’un tableau de bord OSINT
