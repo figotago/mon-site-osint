@@ -5,7 +5,7 @@ ce site a été créé pour rassembler plusieurs outils d’OSINT simples et acc
 Il me permet d’apprendre, pratiquer et centraliser différentes méthodes de recherche d’informations publiques.
 
 ## 🎯 Objectif du projet
-Je suis élève en seconde Bac Pro CIEL, et ce site me sert à pratiquer l’OSINT de manière légale et éducative.  
+Je suis élève en première Bac Pro CIEL, et ce site me sert à pratiquer l’OSINT de manière légale et éducative.  
 Le but est d’avoir une plateforme personnelle pour tester des modules et progresser.
 
 ## 🔍 Outils disponibles
