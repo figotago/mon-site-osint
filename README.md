@@ -1,6 +1,6 @@
 # Mon site OSINT
 
-Actuellement à sa version 2.1 que je poste pour la première fois en publique,
+Actuellement à sa version 2.2,
 ce site a été créé pour rassembler plusieurs outils d’OSINT simples et accessibles.  
 Il me permet d’apprendre, pratiquer et centraliser différentes méthodes de recherche d’informations publiques.
 
