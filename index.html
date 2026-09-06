@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" data-theme="dark">
-<html lang="fr" data-theme="dark"><head>
+<html lang="fr" data-theme="dark" style="--columns-count: 4;"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OSINT &amp; AI Workspace - Liquid Glass Edition</title>
@@ -56,11 +56,11 @@
             -webkit-font-smoothing: antialiased;
         }
 
-       html, body {
-         width: 100%;
-         height: 100%;
-         overflow: hidden;
-}
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
 
         body {
             background: var(--bg-gradient);
@@ -114,6 +114,7 @@
             border-radius: var(--radius-lg);
             padding: 1px;
             background: var(--glass-shine);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
@@ -496,19 +497,19 @@
         }
 
         .main-wrapper { 
-         flex: 1; 
-         padding: 1.25rem; 
-         overflow-y: auto; 
-         overflow-x: hidden; 
-         height: 100vh; 
-         z-index: 1; 
-        -webkit-overflow-scrolling: touch;
-}
+            flex: 1; 
+            padding: 1.25rem; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            height: 100vh; 
+            z-index: 1; 
+            -webkit-overflow-scrolling: touch;
+        }
         
         .container { max-width: 1800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; width: 100%; }
         
         .top-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        header h1 { font-size: 2.2rem; font-weight: 800; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
+        header h1 { font-size: 2.2rem; font-weight: 800; background: var(--title-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
         header p { color: var(--text-muted); font-size: 0.88rem; font-weight: 500; }
 
         .header-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -581,7 +582,7 @@
         .item-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
         .item-title { font-weight: 700; font-size: 0.95rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-url-text { font-size: 0.78rem; color: var(--accent-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; font-weight: 500; }
-        .item-desc { font-size: 0.8rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        .item-desc { font-size: 0.8rem; color: var(--text-muted); display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
 
         .item-top-actions { position: absolute; top: 14px; right: 14px; display: flex; align-items: center; gap: 4px; }
         .star-btn {
@@ -674,7 +675,7 @@
         }
     </style>
 </head>
-<body class="">
+<body>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
@@ -718,13 +719,13 @@
                 </li><li class="folder-item ">
                     <div class="folder-left"><span>🤖</span><span>IA &amp; Outils</span></div>
                     <div class="folder-right">
-                        <span class="folder-count">2</span>
+                        <span class="folder-count">1</span>
                         <button class="menu-dots-btn" onclick="toggleFolderMenu(event, 1)">⋮</button>
                     </div>
                 </li><li class="folder-item ">
                     <div class="folder-left"><span>🕵️</span><span>OSINT</span></div>
                     <div class="folder-right">
-                        <span class="folder-count">11</span>
+                        <span class="folder-count">12</span>
                         <button class="menu-dots-btn" onclick="toggleFolderMenu(event, 2)">⋮</button>
                     </div>
                 </li><li class="folder-item ">
@@ -827,25 +828,25 @@
                     </div>
                 </div><div class="item-card" style="animation-delay: 0.02s;">
                     <div class="item-top-actions">
-                        <button class="star-btn active" onclick="toggleFavorite(1, event)" title="Retirer des favoris">
+                        <button class="star-btn active" onclick="toggleFavorite(16, event)" title="Retirer des favoris">
                             ★
                         </button>
-                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 1)">⋮</button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 16)">⋮</button>
                     </div>
 
                     <div class="item-header">
                         <div class="item-icon-wrapper">
-                            <img src="https://www.google.com/s2/favicons?domain=venice.ai&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                            <span>🔍</span>
                         </div>
                         <div class="item-info">
-                            <div class="item-title">Venice AI Agent</div>
-                            <a href="https://venice.ai" target="_blank" class="item-url-text">venice.ai</a>
+                            <div class="item-title">Epieos</div>
+                            <a href="https://epieos.com" target="_blank" class="item-url-text">epieos.com</a>
                         </div>
                     </div>
-                    <div class="item-desc">Agent IA axé sur la confidentialité.</div>
+                    <div class="item-desc">Recherche et investigation par adresse email ou nom d'utilisateur.</div>
                     <div class="item-footer">
-                        <span class="item-badge">IA &amp; Outils</span>
-                        <a href="https://venice.ai" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://epieos.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
                     </div>
                 </div><div class="item-card" style="animation-delay: 0.04s;">
                     <div class="item-top-actions">
@@ -959,28 +960,6 @@
                     </div>
                 </div><div class="item-card" style="animation-delay: 0.14s;">
                     <div class="item-top-actions">
-                        <button class="star-btn " onclick="toggleFavorite(7, event)" title="Ajouter aux favoris">
-                            ☆
-                        </button>
-                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 7)">⋮</button>
-                    </div>
-
-                    <div class="item-header">
-                        <div class="item-icon-wrapper">
-                            <img src="https://www.google.com/s2/favicons?domain=venice.ai&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
-                        </div>
-                        <div class="item-info">
-                            <div class="item-title">Venice IA Uncensored</div>
-                            <a href="https://venice.ai/chat/classic/B8B304v" target="_blank" class="item-url-text">venice.ai</a>
-                        </div>
-                    </div>
-                    <div class="item-desc">Modèle IA sans censure.</div>
-                    <div class="item-footer">
-                        <span class="item-badge">IA &amp; Outils</span>
-                        <a href="https://venice.ai/chat/classic/B8B304v" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
-                    </div>
-                </div><div class="item-card" style="animation-delay: 0.16s;">
-                    <div class="item-top-actions">
                         <button class="star-btn " onclick="toggleFavorite(8, event)" title="Ajouter aux favoris">
                             ☆
                         </button>
@@ -1001,7 +980,7 @@
                         <span class="item-badge">OSINT</span>
                         <a href="https://osintfr.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
                     </div>
-                </div><div class="item-card" style="animation-delay: 0.18s;">
+                </div><div class="item-card" style="animation-delay: 0.16s;">
                     <div class="item-top-actions">
                         <button class="star-btn " onclick="toggleFavorite(9, event)" title="Ajouter aux favoris">
                             ☆
@@ -1023,7 +1002,7 @@
                         <span class="item-badge">OSINT</span>
                         <a href="https://oathnet.org" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
                     </div>
-                </div><div class="item-card" style="animation-delay: 0.2s;">
+                </div><div class="item-card" style="animation-delay: 0.18s;">
                     <div class="item-top-actions">
                         <button class="star-btn " onclick="toggleFavorite(10, event)" title="Ajouter aux favoris">
                             ☆
@@ -1155,6 +1134,28 @@
                         <span class="item-badge">OSINT</span>
                         <a href="https://github.io" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
                     </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(1788716527499, event)" title="Ajouter aux favoris">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 1788716527499)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">
+                            <img src="https://www.google.com/s2/favicons?domain=venice.ai&amp;sz=64" alt="" onerror="this.onerror=null; this.parentElement.innerText='🔗';">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-title">Venice AI Uncensored</div>
+                            <a href="https://venice.ai/chat/" target="_blank" class="item-url-text">venice.ai</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Une IA sans censure</div>
+                    <div class="item-footer">
+                        <span class="item-badge">IA &amp; Outils</span>
+                        <a href="https://venice.ai/chat/" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
                 </div></div>
             </div>
 
@@ -1169,7 +1170,7 @@
                 <button class="btn-glass" style="padding: 4px 10px;" onclick="closeModal()">✕</button>
             </div>
             
-            <input type="hidden" id="editing-link-id" value="">
+            <input type="hidden" id="editing-link-id" value="1788716527499">
 
             <div class="modal-form-group">
                 <label for="new-link-title">Nom de la ressource</label>
@@ -1193,9 +1194,7 @@
 
             <div class="modal-form-group">
                 <label for="new-link-folder">Catégorie / Dossier</label>
-                <select id="new-link-folder" class="glass-select">
-                    <!-- Options injectées par JS -->
-                </select>
+                <select id="new-link-folder" class="glass-select"><option value="Outils et utilitaires">🧰 Outils et utilitaires</option><option value="IA &amp; Outils">🤖 IA &amp; Outils</option><option value="OSINT">🕵️ OSINT</option><option value="Réseaux &amp; IP">📡 Réseaux &amp; IP</option></select>
             </div>
 
             <div class="modal-actions">
@@ -1309,14 +1308,14 @@
                     "isContactTool": true
           },
           {
-                    "id": 1,
-                    "title": "Venice AI Agent",
-                    "url": "https://venice.ai",
-                    "domain": "venice.ai",
-                    "description": "Agent IA axé sur la confidentialité.",
-                    "category": "IA & Outils",
+                    "id": 16,
+                    "title": "Epieos",
+                    "url": "https://epieos.com",
+                    "domain": "epieos.com",
+                    "description": "Recherche et investigation par adresse email ou nom d'utilisateur.",
+                    "category": "OSINT",
                     "favorite": true,
-                    "customIcon": ""
+                    "customIcon": "🔍"
           },
           {
                     "id": 2,
@@ -1365,16 +1364,6 @@
                     "domain": "github.com",
                     "description": "Dépôts et outils OSINT sur GitHub.",
                     "category": "OSINT",
-                    "favorite": false,
-                    "customIcon": ""
-          },
-          {
-                    "id": 7,
-                    "title": "Venice IA Uncensored",
-                    "url": "https://venice.ai/chat/classic/B8B304v",
-                    "domain": "venice.ai",
-                    "description": "Modèle IA sans censure.",
-                    "category": "IA & Outils",
                     "favorite": false,
                     "customIcon": ""
           },
@@ -1457,6 +1446,16 @@
                     "category": "OSINT",
                     "favorite": false,
                     "customIcon": ""
+          },
+          {
+                    "id": 1788716527499,
+                    "title": "Venice AI Uncensored",
+                    "url": "https://venice.ai/chat/",
+                    "domain": "venice.ai",
+                    "customIcon": "",
+                    "description": "Une IA sans censure",
+                    "category": "IA & Outils",
+                    "favorite": false
           }
 ];
         window.TARGET_NOTES_DATA = "";
@@ -2086,9 +2085,10 @@
         }
     </script>
 
-<div id="folder-menu-global" class="folder-dropdown-menu" style="top: 506.75px; left: 161px;">
-                <button class="dropdown-item" onclick="changeFolderIcon(event, 4)">🎨 Changer l'icône</button>
-                <button class="dropdown-item" onclick="renameFolder(event, 4)">✏️ Renommer</button>
-                <button class="dropdown-item danger" onclick="deleteFolder(event, 4)">🗑️ Supprimer</button>
+<div id="card-menu-global" class="card-dropdown-menu" style="top: 831.766px; left: 2584.11px;">
+                <button class="dropdown-item" onclick="openPreviewModal('https://venice.ai/chat/', 'Venice AI Uncensored')">👁️ Aperçu</button>
+                <button class="dropdown-item" onclick="openEditModal(1788716527499)">✏️ Modifier</button>
+                <button class="dropdown-item" onclick="changeCardIcon(1788716527499, event)">🎨 Changer l'icône</button>
+                <button class="dropdown-item danger" onclick="deleteLink(1788716527499)">🗑️ Supprimer</button>
             </div></body></html>
 </html>
