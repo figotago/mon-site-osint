@@ -41,5 +41,6 @@ La bêta tu prochain site est déjà disponible en HTML
 - Ajout d’un tableau de bord OSINT
 - Modification "Carnet d'adresses Cible"
 - Ajout de note améliorer
+- ajout de création de compte et de sauvegarde de données
 - Autre amélioration et d'ajout de fonctionalité
 (La version est disponible en bêta qui est la version 3.0)
