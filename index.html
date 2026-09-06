@@ -740,7 +740,7 @@
             <!-- Bloc Notes / Dashboard cible persistant -->
             <div class="sidebar-notes-box">
                 <div class="sidebar-notes-header">
-                    <span>📝 Notes </span>
+                    <span>📝 Notes Rapide</span>
                     <button class="btn-glass" style="padding: 1px 6px; font-size: 0.65rem;" onclick="clearNotes()">Effacer</button>
                 </div>
                 <textarea id="target-notes" class="sidebar-notes-textarea" placeholder="Notez ici les pseudos, emails, IP ou faits trouvés sur la cible..." oninput="saveNotes()"></textarea>
@@ -776,7 +776,7 @@
                 <div class="header-controls">
                     <button class="btn-glass btn-primary" onclick="openAddModal()">➕ Nouveau site</button>
                     <button class="btn-glass" onclick="exportHTML()" style="border-color: var(--accent-color); color: var(--accent-color);">💾 Sauvegarder</button>
-                    <button class="btn-glass" onclick="toggleTheme()" id="theme-btn">☀️ Mode</button>
+                    <button class="btn-glass" onclick="toggleTheme()" id="theme-btn">☀️ Mode Sombre / Clair</button>
                 </div>
             </div>
 
@@ -785,13 +785,13 @@
                 <span class="search-icon">🔍</span>
                 <input type="text" id="search-bar" class="search-input" placeholder="Rechercher une ressource, un réseau social, un outil..." oninput="handleSearch()">
                 <button id="clear-search" class="clear-search-btn" onclick="clearSearch()" title="Effacer">✕</button>
-                <span class="keyboard-shortcut">⌘ K</span>
+                <span class="keyboard-shortcut">⌘/CTRL K</span>
             </div>
 
             <!-- CONTENEUR DES CARTES -->
             <div class="glass-panel category-card">
                 <div class="category-title">
-                    <span id="current-folder-title">📂 Tous les éléments</span>
+                    <span id="current-folder-title">📂 Tous les sites et cibles</span>
                     <div class="category-controls">
                         <select id="column-select" class="glass-select" style="width: 130px;" onchange="changeColumns(this.value)">
                             <option value="5">5 Colonnes</option>
@@ -2092,4 +2092,3 @@
                 <button class="dropdown-item danger" onclick="deleteLink(1788716527499)">🗑️ Supprimer</button>
             </div></body></html>
 </html>
- 
