@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark" style="--columns-count: 3;"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT &amp; AI Workspace - Liquid Glass Edition</title>
+    
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #0f172a 50%, #030712 100%);
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-bg-hover: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-border-light: rgba(255, 255, 255, 0.3);
+            --glass-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(56, 189, 248, 0.2) 100%);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.35);
+            --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            --danger-color: #f43f5e;
+            --sidebar-width: 320px;
+            --select-option-bg: #0f172a;
+            --select-option-color: #f8fafc;
+            --title-gradient: linear-gradient(135deg, #38bdf8 0%, #a855f7 50%, #ec4899 100%);
+            --columns-count: 3;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --star-color: #f59e0b;
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: radial-gradient(circle at 50% -20%, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-bg-hover: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-border-light: rgba(255, 255, 255, 0.9);
+            --glass-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(2, 132, 199, 0.15) 100%);
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.25);
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            --danger-color: #e11d48;
+            --select-option-bg: #ffffff;
+            --select-option-color: #0f172a;
+            --title-gradient: linear-gradient(135deg, #0284c7 0%, #6366f1 50%, #d946ef 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-color);
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .background-blobs {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            animation: liquidMove 22s infinite ease-in-out alternate;
+            will-change: transform;
+        }
+
+        .blob-1 { width: 700px; height: 700px; background: var(--accent-glow); top: -200px; left: -150px; }
+        .blob-2 { width: 650px; height: 650px; background: rgba(168, 85, 247, 0.2); bottom: -200px; right: -100px; animation-delay: -8s; }
+        .blob-3 { width: 450px; height: 450px; background: rgba(236, 72, 153, 0.15); top: 30%; right: 25%; animation-delay: -15s; }
+
+        @keyframes liquidMove {
+            0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate3d(60px, -40px, 0) scale(1.1) rotate(120deg); }
+            100% { transform: translate3d(-40px, 60px, 0) scale(0.95) rotate(240deg); }
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(210%);
+            -webkit-backdrop-filter: blur(40px) saturate(210%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-lg);
+            padding: 1px;
+            background: var(--glass-shine);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .btn-glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.83rem;
+            cursor: pointer;
+            backdrop-filter: blur(25px);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-glass:hover {
+            background: var(--glass-bg-hover);
+            transform: translateY(-2px) scale(1.01);
+            border-color: var(--glass-border-light);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        .btn-glass:active { transform: translateY(0) scale(0.97); }
+        .btn-danger { color: var(--danger-color); }
+        .btn-danger:hover { background: rgba(244, 63, 94, 0.15); border-color: var(--danger-color); box-shadow: 0 8px 25px rgba(244, 63, 94, 0.25); }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: var(--accent-color);
+            filter: brightness(1.1);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        /* SIDEBAR */
+        sidebar {
+            width: var(--sidebar-width);
+            margin: 1.25rem 0 1.25rem 1.25rem;
+            padding: 1.25rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex-shrink: 0;
+            height: calc(100vh - 2.5rem);
+            min-height: 0;
+            box-sizing: border-box;
+            position: sticky;
+            top: 1.25rem;
+            z-index: 10;
+            transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s ease;
+        }
+
+        body.sidebar-minimized sidebar {
+            width: 80px;
+            padding: 1.25rem 0.5rem;
+        }
+
+        .sidebar-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%;
+        }
+
+        body.sidebar-minimized sidebar .sidebar-header { justify-content: center; }
+
+        .sidebar-title { 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            color: var(--accent-color); 
+            letter-spacing: 0.1em; 
+            text-transform: uppercase;
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity 0.2s ease;
+        }
+
+        body.sidebar-minimized sidebar .sidebar-title { opacity: 0; pointer-events: none; width: 0; }
+
+        .toggle-btn-sidebar { padding: 6px 10px; font-size: 0.8rem; border-radius: 10px; cursor: pointer; flex-shrink: 0; }
+
+        .add-folder-top { width: 100%; white-space: nowrap; overflow: hidden; transition: opacity 0.2s ease; }
+        body.sidebar-minimized sidebar .add-folder-top { opacity: 0; pointer-events: none; height: 0; padding: 0; margin: 0; border: none; }
+
+        .sidebar-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+        }
+
+        body.sidebar-minimized sidebar .sidebar-sections { overflow-y: hidden; }
+
+        .sidebar-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.4rem;
+            padding-left: 4px;
+        }
+        body.sidebar-minimized sidebar .sidebar-section-title { display: none; }
+
+        .folder-list { 
+            list-style: none; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.35rem; 
+            width: 100%;
+        }
+
+        .folder-item {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .folder-item:hover {
+            background: var(--glass-bg-hover);
+            color: var(--text-color);
+            border-color: var(--glass-border);
+        }
+
+        .folder-item.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .folder-left { display: flex; align-items: center; gap: 10px; overflow: hidden; white-space: nowrap; flex: 1; pointer-events: none; }
+        .folder-right { display: flex; align-items: center; gap: 6px; }
+
+        body.sidebar-minimized sidebar .folder-left span:last-child,
+        body.sidebar-minimized sidebar .folder-right,
+        body.sidebar-minimized sidebar .sidebar-notes-box,
+        body.sidebar-minimized sidebar .sidebar-social-footer { display: none; }
+
+        body.sidebar-minimized sidebar .folder-left { justify-content: center; width: 100%; }
+        body.sidebar-minimized sidebar .folder-item { justify-content: center; padding: 10px 0; }
+
+        .folder-count { 
+            background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid var(--glass-border); 
+            padding: 2px 7px; 
+            border-radius: 20px; 
+            font-size: 0.7rem; 
+            color: var(--accent-color); 
+            font-weight: 700; 
+            pointer-events: none;
+        }
+
+        .menu-dots-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .menu-dots-btn:hover { color: var(--text-color); background: rgba(255,255,255,0.15); }
+
+        .folder-dropdown-menu, .card-dropdown-menu {
+            display: none;
+            position: fixed;
+            background: var(--select-option-bg);
+            border: 1px solid var(--glass-border-light);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            z-index: 99999;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(30px);
+            min-width: 170px;
+        }
+        .folder-dropdown-menu.show, .card-dropdown-menu.show { display: flex; flex-direction: column; gap: 4px; }
+        .folder-menu-btn {
+            background: transparent; border: none; color: var(--text-muted); cursor: pointer;
+            padding: 3px 6px; border-radius: 7px; font-size: 1rem; line-height: 1;
+            opacity: 0; transition: opacity .18s ease, background .18s ease, color .18s ease;
+        }
+        .folder-item:hover .folder-menu-btn, .folder-item.active .folder-menu-btn { opacity: 1; }
+        .folder-menu-btn:hover { color: var(--text-color); background: rgba(255,255,255,.12); }
+
+        .dropdown-item {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .dropdown-item:hover { background: var(--glass-bg-hover); }
+        .dropdown-item.danger:hover { background: rgba(244, 63, 94, 0.15); color: var(--danger-color); }
+
+        /* BLOC DE NOTES RAPIDES */
+        .sidebar-notes-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 5px;
+        }
+        .sidebar-notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .sidebar-notes-textarea {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 0.82rem;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+            line-height: 1.4;
+            font-family: inherit;
+        }
+        .sidebar-notes-textarea::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+        /* BARRE DE RÉSEAUX SOCIAUX EN BAS DE SIDEBAR AVEC LOGOS SVG */
+        .sidebar-social-footer {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .social-icon-link {
+            width: 38px;
+            height: 38px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(15px);
+        }
+
+        .social-icon-link svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            transition: fill 0.2s;
+        }
+
+        .social-icon-link:hover {
+            background: var(--glass-bg-hover);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .glass-input, .glass-select {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            color: var(--text-color);
+            font-size: 0.88rem;
+            outline: none;
+            backdrop-filter: blur(20px);
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .glass-select option {
+            background-color: var(--select-option-bg) !important;
+            color: var(--select-option-color) !important;
+            padding: 10px;
+        }
+        .glass-input:focus, .glass-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-glow);
+            background: var(--glass-bg-hover);
+        }
+
+        .search-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(40px) saturate(210%);
+            -webkit-backdrop-filter: blur(40px) saturate(210%);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .search-card:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 25px var(--accent-glow), var(--card-shadow);
+            background: var(--glass-bg-hover);
+        }
+        .search-icon { font-size: 1rem; color: var(--text-muted); user-select: none; display: flex; align-items: center; }
+        .search-input {
+            flex: 1;
+            border: none !important;
+            background: transparent !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: var(--text-color);
+            font-size: 0.92rem;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+        .search-input::placeholder { color: var(--text-muted); opacity: 0.7; }
+        .clear-search-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .clear-search-btn:hover { background: rgba(255, 255, 255, 0.25); color: var(--text-color); }
+        .keyboard-shortcut {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .main-wrapper { 
+            flex: 1 1 auto; 
+            min-width: 0;
+            min-height: 0;
+            max-height: 100vh;
+            padding: 1.25rem; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            height: 100vh; 
+            z-index: 1; 
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .container { max-width: 1800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; width: 100%; }
+        
+        .top-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        header h1 { font-size: 2.2rem; font-weight: 800; background: var(--title-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
+        header p { color: var(--text-muted); font-size: 0.88rem; font-weight: 500; }
+
+        .header-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .category-card { padding: 1.4rem; }
+        .category-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 1.4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+        .category-controls { display: flex; align-items: center; gap: 12px; }
+
+        .columns-container {
+            display: grid;
+            grid-template-columns: repeat(var(--columns-count), minmax(0, 1fr));
+            gap: 1.2rem;
+            align-items: start;
+            width: 100%;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .columns-container.switching { opacity: 0; transform: translateY(-8px); }
+
+        .item-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            word-break: break-word;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(30px);
+            opacity: 0;
+            transform: translate3d(0, 15px, 0);
+            animation: liquidCardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+
+        @keyframes liquidCardFadeIn { to { opacity: 1; transform: translate3d(0, 0, 0); } }
+
+        .item-card:hover {
+            background: var(--glass-bg-hover);
+            transform: translate3d(0, -5px, 0) scale(1.01);
+            border-color: var(--glass-border-light);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 25px var(--accent-glow);
+        }
+
+        .item-header { display: flex; align-items: flex-start; gap: 12px; min-width: 0; padding-right: 50px; }
+        
+        .item-icon-wrapper {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+        .item-icon-wrapper img { width: 24px; height: 24px; object-fit: contain; }
+        .item-card:hover .item-icon-wrapper {
+            transform: scale(1.08) rotate(3deg);
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .item-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+        .item-title { font-weight: 700; font-size: 0.95rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-url-text { font-size: 0.78rem; color: var(--accent-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; font-weight: 500; }
+        .item-desc { font-size: 0.8rem; color: var(--text-muted); display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+
+        .item-top-actions { position: absolute; top: 14px; right: 14px; display: flex; align-items: center; gap: 4px; }
+        .star-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            padding: 4px;
+            line-height: 1;
+            transition: transform 0.2s, color 0.2s;
+        }
+        .star-btn:hover { transform: scale(1.2); }
+        .star-btn.active { color: var(--star-color); text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+
+        .item-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            gap: 6px;
+        }
+        .item-badge {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-color);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-color); }
+        
+        .modal-form-group { display: flex; flex-direction: column; gap: 6px; }
+        .modal-form-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 0.8rem; }
+
+        .preview-modal-card {
+            width: 90vw;
+            height: 85vh;
+            max-width: 1400px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: var(--radius-md);
+            background: #ffffff;
+        }
+
+        /* ===== AMÉLIORATIONS : ANIMATIONS + SIDEBAR + MOBILE ===== */
+        sidebar {
+            overflow: hidden;
+            transition:
+                width 0.48s cubic-bezier(.22,1,.36,1),
+                margin 0.48s cubic-bezier(.22,1,.36,1),
+                padding 0.38s cubic-bezier(.22,1,.36,1),
+                transform 0.48s cubic-bezier(.22,1,.36,1),
+                opacity 0.35s ease;
+            will-change: width, transform;
+        }
+
+        .sidebar-header,
+        .sidebar-title,
+        .add-folder-top,
+        .sidebar-sections,
+        .sidebar-social-footer,
+        .folder-item,
+        .sidebar-notes-box {
+            transition:
+                opacity 0.28s ease,
+                transform 0.42s cubic-bezier(.22,1,.36,1);
+        }
+
+        .toggle-btn-sidebar {
+            min-width: 38px;
+            min-height: 34px;
+            transition: transform .38s cubic-bezier(.22,1,.36,1), background .25s ease;
+        }
+
+        body.sidebar-minimized .toggle-btn-sidebar {
+            transform: rotate(180deg);
+        }
+
+        body.sidebar-minimized sidebar .sidebar-sections,
+        body.sidebar-minimized sidebar .sidebar-social-footer,
+        body.sidebar-minimized sidebar .sidebar-notes-box {
+            transform: scale(.96);
+        }
+
+        .main-wrapper {
+            transition: padding-left .42s cubic-bezier(.22,1,.36,1);
+        }
+
+        .item-card {
+            animation: liquidCardFadeIn .52s cubic-bezier(.22,1,.36,1) both;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        @keyframes liquidCardFadeIn {
+            0% { opacity: 0; transform: translate3d(0, 20px, 0) scale(.985); filter: blur(3px); }
+            65% { opacity: 1; filter: blur(0); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+        }
+
+        .item-card:hover {
+            transition:
+                transform .32s cubic-bezier(.22,1,.36,1),
+                background .28s ease,
+                border-color .28s ease,
+                box-shadow .32s ease;
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+
+        .btn-glass, .folder-item, .social-icon-link, .search-card, .glass-input, .glass-select {
+            transition-timing-function: cubic-bezier(.22,1,.36,1);
+        }
+
+        .mobile-sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 10001;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            box-shadow: 0 12px 30px rgba(0,0,0,.25);
+        }
+
+        .sidebar-mobile-backdrop {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            :root { --sidebar-width: 285px; }
+
+            body {
+                display: block;
+            }
+
+            sidebar {
+                position: fixed;
+                left: 12px;
+                top: 12px;
+                bottom: 12px;
+                width: min(var(--sidebar-width), calc(100vw - 24px));
+                height: auto;
+                margin: 0;
+                z-index: 10000;
+                transform: translateX(0);
+                box-shadow: 0 25px 70px rgba(0,0,0,.45);
+            }
+
+            body.sidebar-minimized sidebar {
+                width: min(var(--sidebar-width), calc(100vw - 24px));
+                transform: translateX(calc(-100% - 24px));
+                padding: 1.25rem 1rem;
+            }
+
+            body.sidebar-minimized sidebar .sidebar-title,
+            body.sidebar-minimized sidebar .add-folder-top,
+            body.sidebar-minimized sidebar .sidebar-section-title,
+            body.sidebar-minimized sidebar .folder-left span:last-child,
+            body.sidebar-minimized sidebar .folder-right,
+            body.sidebar-minimized sidebar .sidebar-notes-box,
+            body.sidebar-minimized sidebar .sidebar-social-footer {
+                display: initial;
+            }
+
+            body.sidebar-minimized sidebar .sidebar-title { opacity: 1; width: auto; pointer-events: auto; }
+            body.sidebar-minimized sidebar .add-folder-top { opacity: 1; height: auto; padding: 9px 18px; margin: 0; border: 1px solid var(--glass-border); pointer-events: auto; }
+            body.sidebar-minimized sidebar .folder-left { justify-content: flex-start; width: auto; }
+            body.sidebar-minimized sidebar .folder-item { justify-content: space-between; padding: 9px 12px; }
+
+            .mobile-sidebar-toggle {
+                display: inline-flex;
+            }
+
+            .main-wrapper {
+                width: 100%;
+                height: 100dvh;
+                max-height: none;
+                padding: 72px 12px 18px;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .container {
+                gap: .9rem;
+            }
+
+            .top-header {
+                padding-left: 52px;
+                gap: .75rem;
+            }
+
+            header h1 {
+                font-size: clamp(1.55rem, 6vw, 2rem);
+                line-height: 1.1;
+            }
+
+            header p {
+                font-size: .8rem;
+            }
+
+            .header-controls {
+                width: 100%;
+            }
+
+            .header-controls .btn-glass {
+                flex: 1;
+                min-height: 42px;
+            }
+
+            .search-card {
+                padding: 5px 12px;
+            }
+
+            .keyboard-shortcut {
+                display: none;
+            }
+
+            .category-card {
+                padding: 1rem;
+            }
+
+            .category-title {
+                margin-bottom: 1rem;
+            }
+
+            .category-controls {
+                width: 100%;
+            }
+
+            .category-controls .glass-select {
+                width: 100% !important;
+            }
+
+            .columns-container {
+                grid-template-columns: 1fr !important;
+                gap: .85rem;
+            }
+
+            .item-card {
+                padding: 14px;
+            }
+
+            .modal-overlay {
+                padding: 10px;
+                align-items: flex-end;
+            }
+
+            .modal-card {
+                max-height: 92dvh;
+                padding: 1.2rem;
+                border-radius: 20px 20px 14px 14px;
+                transform: translateY(40px) scale(.98);
+            }
+
+            .preview-modal-card {
+                width: calc(100vw - 20px);
+                height: 88dvh;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .top-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .top-header header {
+                padding-top: 4px;
+            }
+
+            .header-controls {
+                flex-direction: column;
+            }
+
+            .header-controls .btn-glass {
+                width: 100%;
+            }
+
+            .item-footer {
+                flex-wrap: wrap;
+            }
+
+            .sidebar-social-footer {
+                gap: 4px;
+            }
+
+            .social-icon-link {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="">
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- SIDEBAR ESPACE DE TRAVAIL & NOTES -->
+    <sidebar class="glass-panel" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">
+                <span>⚡ OSINT et OUTILS</span>
+            </div>
+            <button class="btn-glass toggle-btn-sidebar" id="sidebar-toggle" onclick="toggleSidebar()" aria-label="Réduire la barre latérale" title="Réduire la barre latérale">◀</button>
+        </div>
+
+        <button class="btn-glass add-folder-top" onclick="promptAddFolder()">+ Nouvelle catégorie</button>
+
+        <div class="sidebar-sections">
+            <!-- Vues globales -->
+            <div>
+                <div class="sidebar-section-title">Navigation</div>
+                <ul class="folder-list" id="global-nav-list"><li class="folder-item active">
+                <div class="folder-left"><span>📂</span><span>Tous les éléments</span></div>
+                <div class="folder-right"><span class="folder-count">19</span></div>
+            </li><li class="folder-item ">
+                <div class="folder-left"><span style="color: var(--star-color);">⭐</span><span>Favoris</span></div>
+                <div class="folder-right"><span class="folder-count">4</span></div>
+            </li></ul>
+            </div>
+
+            <!-- Catégories dynamiques -->
+            <div>
+                <div class="sidebar-section-title">Catégories &amp; Dossiers</div>
+                <ul class="folder-list" id="folder-list"><li class="folder-item ">
+                    <div class="folder-left"><span>🧰</span><span>Outils et utilitaires</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">1</span>
+                        <button class="folder-menu-btn" title="Modifier la catégorie" onclick="toggleFolderMenu(event, 0)">⋮</button>
+                    </div>
+                </li><li class="folder-item ">
+                    <div class="folder-left"><span>🤖</span><span>IA &amp; Outils</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">1</span>
+                        <button class="folder-menu-btn" title="Modifier la catégorie" onclick="toggleFolderMenu(event, 1)">⋮</button>
+                    </div>
+                </li><li class="folder-item ">
+                    <div class="folder-left"><span>🕵️</span><span>OSINT</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">15</span>
+                        <button class="folder-menu-btn" title="Modifier la catégorie" onclick="toggleFolderMenu(event, 2)">⋮</button>
+                    </div>
+                </li><li class="folder-item ">
+                    <div class="folder-left"><span>📡</span><span>Réseaux &amp; IP</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">2</span>
+                        <button class="folder-menu-btn" title="Modifier la catégorie" onclick="toggleFolderMenu(event, 3)">⋮</button>
+                    </div>
+                </li></ul>
+            </div>
+
+            <!-- Bloc Notes / Dashboard cible persistant -->
+            <div class="sidebar-notes-box">
+                <div class="sidebar-notes-header">
+                    <span>📝 Notes Rapides</span>
+                    <button class="btn-glass" style="padding: 1px 6px; font-size: 0.65rem;" onclick="clearNotes()">Effacer</button>
+                </div>
+                <textarea id="target-notes" class="sidebar-notes-textarea" placeholder="Notez ici les pseudos, emails, IP ou faits trouvés sur la cible..." oninput="saveNotes()"></textarea>
+            </div>
+        </div>
+
+        <!-- BARRE DE RÉSEAUX SOCIAUX -->
+        <div class="sidebar-social-footer">
+            <a href="https://github.com" target="_blank" class="social-icon-link" title="GitHub">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path></svg>
+            </a>
+            <a href="https://discord.com" target="_blank" class="social-icon-link" title="Discord">
+                <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path></svg>
+            </a>
+            <a href="https://twitter.com" target="_blank" class="social-icon-link" title="X (Twitter)">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+            </a>
+            <a href="https://web.telegram.org" target="_blank" class="social-icon-link" title="Telegram">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.693-1.653-1.124-2.678-1.8-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635.099-.002.321.023.465.141.119.098.152.228.163.33.016.116.033.378.017.585z"></path></svg>
+            </a>
+        </div>
+    </sidebar>
+
+    <!-- BOUTON MOBILE -->
+    <button class="btn-glass mobile-sidebar-toggle" onclick="toggleSidebar()" aria-label="Ouvrir le menu">☰</button>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="main-wrapper">
+        <div class="container">
+            
+            <div class="top-header">
+                <header>
+                <h1>OSINT &amp; CSINT Workspace</h1>
+                    <p>Plateforme d'investigation, réseaux sociaux et centralisation d'indices</p>
+                </header>
+                <div class="header-controls">
+                    <button class="btn-glass btn-primary" onclick="openAddModal()">➕ Nouveau site</button>
+                    <button class="btn-glass" onclick="toggleTheme()" id="theme-btn">☀️ Mode Sombre / Clair</button>
+                </div>
+            </div>
+
+            <!-- BARRE DE RECHERCHE -->
+            <div class="glass-panel search-card">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-bar" class="search-input" placeholder="Rechercher une ressource, un réseau social, un outil..." oninput="handleSearch()">
+                <button id="clear-search" class="clear-search-btn" onclick="clearSearch()" title="Effacer">✕</button>
+                <span class="keyboard-shortcut">⌘/CTRL K</span>
+            </div>
+
+            <!-- CONTENEUR DES CARTES -->
+            <div class="glass-panel category-card">
+                <div class="category-title">
+                    <span id="current-folder-title">📂 Tous les sites et cibles</span>
+                    <div class="category-controls">
+                        <select id="column-select" class="glass-select" style="width: 130px;" onchange="changeColumns(this.value)">
+                            <option value="5">5 Colonnes</option>
+                            <option value="4">4 Colonnes</option>
+                            <option value="3" selected="">3 Colonnes</option>
+                            <option value="2">2 Colonnes</option>
+                            <option value="1">1 Colonne</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="columns-container" id="cards-container"><div class="item-card" style="animation-delay: 0s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(100, event)">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 100)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><span>📒</span></div>
+                        <div class="item-info">
+                            <div class="item-title">Carnet d'adresses Cible</div>
+                            <a href="#" target="_blank" class="item-url-text">utilitaire.local</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Gestionnaire et carnet d'adresses centralisé pour profils cibles.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">Outils et utilitaires</span>
+                        <button class="btn-glass btn-primary" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openContactModal()">Créer un contact ➕</button>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.02s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(16, event)">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 16)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=epieos.com&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Epieos</div>
+                            <a href="https://epieos.com" target="_blank" class="item-url-text">epieos.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Recherche et investigation par adresse email ou nom d'utilisateur.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://epieos.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.04s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(2, event)">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 2)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=whatsmyname.me&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">WhatsMyName.me</div>
+                            <a href="https://whatsmyname.me" target="_blank" class="item-url-text">whatsmyname.me</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Vérification de pseudos.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://whatsmyname.me" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.06s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(3, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 3)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=whatsmyname.app&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">WhatsMyName Web</div>
+                            <a href="https://whatsmyname.app" target="_blank" class="item-url-text">whatsmyname.app</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Version web de WhatsMyName.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://whatsmyname.app" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.08s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn active" onclick="toggleFavorite(4, event)">
+                            ★
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 4)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=osintframework.com&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">OSINT Framework</div>
+                            <a href="https://osintframework.com" target="_blank" class="item-url-text">osintframework.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Arborescence interactive de ressources d'investigation.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://osintframework.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.1s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(5, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 5)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=shodan.io&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Shodan IP</div>
+                            <a href="https://shodan.io" target="_blank" class="item-url-text">shodan.io</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Moteur de recherche pour appareils connectés.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">Réseaux &amp; IP</span>
+                        <a href="https://shodan.io" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.12s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(6, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 6)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=github.com&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">GitHub Tout-osint</div>
+                            <a href="https://github.com" target="_blank" class="item-url-text">github.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Dépôts et outils OSINT sur GitHub.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://github.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.14s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(8, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 8)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=osintfr.com&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Outils OSINT</div>
+                            <a href="https://osintfr.com" target="_blank" class="item-url-text">osintfr.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Ressources et outils d'investigation francophones.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://osintfr.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.16s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(9, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 9)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=oathnet.org&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">OathNet Intelligence</div>
+                            <a href="https://oathnet.org" target="_blank" class="item-url-text">oathnet.org</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Plateforme de renseignement et OSINT.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://oathnet.org" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.18s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(10, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 10)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=see-know.ru&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">SeekNow Platform</div>
+                            <a href="https://see-know.ru" target="_blank" class="item-url-text">see-know.ru</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Recherche et indexation d'indices.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://see-know.ru" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.2s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(11, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 11)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=kerbes.org&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Kerbes OSINT</div>
+                            <a href="https://kerbes.org" target="_blank" class="item-url-text">kerbes.org</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Outils et liens d'investigation.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://kerbes.org" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.22s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(12, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 12)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=brixhub.to&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">BrixHub</div>
+                            <a href="https://brixhub.to" target="_blank" class="item-url-text">brixhub.to</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Plateforme de ressources et liens utiles.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://brixhub.to" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.24s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(13, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 13)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=stryxx.net&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Stryxx</div>
+                            <a href="https://stryxx.net" target="_blank" class="item-url-text">stryxx.net</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Outil de recherche et d'investigation.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://stryxx.net" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.26s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(14, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 14)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=trouver-ip.com&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Localiser IP</div>
+                            <a href="https://trouver-ip.com" target="_blank" class="item-url-text">trouver-ip.com</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Outil de géolocalisation d'adresses IP.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">Réseaux &amp; IP</span>
+                        <a href="https://trouver-ip.com" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.28s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(15, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 15)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=github.io&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Marine Data</div>
+                            <a href="https://github.io" target="_blank" class="item-url-text">github.io</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Données maritimes et traçage.</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://github.io" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.3s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(1788716527499, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 1788716527499)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=venice.ai&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Venice AI Uncensored</div>
+                            <a href="https://venice.ai/chat/" target="_blank" class="item-url-text">venice.ai</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Une IA sans censure</div>
+                    <div class="item-footer">
+                        <span class="item-badge">IA &amp; Outils</span>
+                        <a href="https://venice.ai/chat/" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.32s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(1791120938676, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 1791120938676)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=astralsearcher.org&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Astral Searcher</div>
+                            <a href="https://astralsearcher.org" target="_blank" class="item-url-text">astralsearcher.org</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">osent recherche simplifié</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://astralsearcher.org" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.34s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(1791120980122, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 1791120980122)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=www.csint.tools&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">CSINT tool</div>
+                            <a href="https://www.csint.tools" target="_blank" class="item-url-text">www.csint.tools</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Intelligence plateforme</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://www.csint.tools" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div><div class="item-card" style="animation-delay: 0.36s;">
+                    <div class="item-top-actions">
+                        <button class="star-btn " onclick="toggleFavorite(1791121227515, event)">
+                            ☆
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, 1791121227515)">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper"><img src="https://www.google.com/s2/favicons?domain=intelx.io&amp;sz=64" onerror="this.parentElement.innerText='🔗'"></div>
+                        <div class="item-info">
+                            <div class="item-title">Intelligence X</div>
+                            <a href="https://intelx.io" target="_blank" class="item-url-text">intelx.io</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">Osint recherche nom prénom et autres</div>
+                    <div class="item-footer">
+                        <span class="item-badge">OSINT</span>
+                        <a href="https://intelx.io" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>
+                    </div>
+                </div></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALE : AJOUTER / ÉDITER UN LIEN -->
+    <div class="modal-overlay" id="add-modal" onclick="closeModalOnOverlay(event)">
+        <div class="glass-panel modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title-text">Modifier la ressource</h3>
+                <button class="btn-glass" style="padding: 4px 10px;" onclick="closeModal()">✕</button>
+            </div>
+            
+            <input type="hidden" id="editing-link-id" value="3">
+
+            <div class="modal-form-group">
+                <label for="new-link-title">Nom de la ressource</label>
+                <input type="text" id="new-link-title" class="glass-input" placeholder="ex: X (Twitter) / LinkedIn">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-url">Lien / URL</label>
+                <input type="text" id="new-link-url" class="glass-input" placeholder="ex: https://linkedin.com">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-icon">Icône personnalisée (Emoji ou URL d'image)</label>
+                <input type="text" id="new-link-icon" class="glass-input" placeholder="ex: 💼 ou https://...">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-desc">Description (optionnelle)</label>
+                <input type="text" id="new-link-desc" class="glass-input" placeholder="Description de l'outil ou profil cible...">
+            </div>
+
+            <div class="modal-form-group">
+                <label for="new-link-folder">Catégorie / Dossier</label>
+                <select id="new-link-folder" class="glass-select"><option value="Outils et utilitaires">🧰 Outils et utilitaires</option><option value="IA &amp; Outils">🤖 IA &amp; Outils</option><option value="OSINT">🕵️ OSINT</option><option value="Réseaux &amp; IP">📡 Réseaux &amp; IP</option></select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-glass" onclick="closeModal()">Annuler</button>
+                <button class="btn-glass btn-primary" onclick="saveLink()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE : CRÉER UN CONTACT -->
+    <div class="modal-overlay" id="contact-modal" onclick="closeContactModalOnOverlay(event)">
+        <div class="glass-panel modal-card">
+            <div class="modal-header">
+                <h3>🧰 Nouveau Contact / Cible</h3>
+                <button class="btn-glass" style="padding: 4px 10px;" onclick="closeContactModal()">✕</button>
+            </div>
+            
+            <div class="modal-form-group">
+                <label>Nom</label>
+                <input type="text" id="contact-nom" class="glass-input" placeholder="Nom de famille">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Prénom</label>
+                <input type="text" id="contact-prenom" class="glass-input" placeholder="Prénom">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Téléphone</label>
+                <input type="text" id="contact-telephone" class="glass-input" placeholder="ex: +33600000000">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Travail / Profession</label>
+                <input type="text" id="contact-travail" class="glass-input" placeholder="Entreprise ou poste">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Adresse IP</label>
+                <input type="text" id="contact-ip" class="glass-input" placeholder="ex: 192.168.1.1">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Adresse postale</label>
+                <input type="text" id="contact-adresse" class="glass-input" placeholder="Rue, numéro...">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Code postal</label>
+                <input type="text" id="contact-codepostaler" class="glass-input" placeholder="ex: 75001">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Date de naissance</label>
+                <input type="date" id="contact-dae" class="glass-input">
+            </div>
+
+            <div class="modal-form-group">
+                <label>Immatriculation</label>
+                <input type="text" id="contact-immatriculation" class="glass-input" placeholder="ex: AB-123-CD">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-glass" onclick="closeContactModal()">Annuler</button>
+                <button class="btn-glass btn-primary" onclick="saveContact()">Ajouter au carnet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DONNÉES EMBARQUÉES ET LOGIQUE JS -->
+    <script id="embedded-data">
+        window.INITIAL_FOLDERS = [
+          {
+                    "name": "Outils et utilitaires",
+                    "icon": "🧰"
+          },
+          {
+                    "name": "IA & Outils",
+                    "icon": "🤖"
+          },
+          {
+                    "name": "OSINT",
+                    "icon": "🕵️"
+          },
+          {
+                    "name": "Réseaux & IP",
+                    "icon": "📡"
+          }
+];
+        window.INITIAL_LINKS = [
+          {
+                    "id": 100,
+                    "title": "Carnet d'adresses Cible",
+                    "url": "#",
+                    "domain": "utilitaire.local",
+                    "description": "Gestionnaire et carnet d'adresses centralisé pour profils cibles.",
+                    "category": "Outils et utilitaires",
+                    "favorite": true,
+                    "customIcon": "📒",
+                    "isContactTool": true
+          },
+          {
+                    "id": 16,
+                    "title": "Epieos",
+                    "url": "https://epieos.com",
+                    "domain": "epieos.com",
+                    "description": "Recherche et investigation par adresse email ou nom d'utilisateur.",
+                    "category": "OSINT",
+                    "favorite": true,
+                    "customIcon": ""
+          },
+          {
+                    "id": 2,
+                    "title": "WhatsMyName.me",
+                    "url": "https://whatsmyname.me",
+                    "domain": "whatsmyname.me",
+                    "description": "Vérification de pseudos.",
+                    "category": "OSINT",
+                    "favorite": true,
+                    "customIcon": ""
+          },
+          {
+                    "id": 3,
+                    "title": "WhatsMyName Web",
+                    "url": "https://whatsmyname.app",
+                    "domain": "whatsmyname.app",
+                    "description": "Version web de WhatsMyName.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 4,
+                    "title": "OSINT Framework",
+                    "url": "https://osintframework.com",
+                    "domain": "osintframework.com",
+                    "description": "Arborescence interactive de ressources d'investigation.",
+                    "category": "OSINT",
+                    "favorite": true,
+                    "customIcon": ""
+          },
+          {
+                    "id": 5,
+                    "title": "Shodan IP",
+                    "url": "https://shodan.io",
+                    "domain": "shodan.io",
+                    "description": "Moteur de recherche pour appareils connectés.",
+                    "category": "Réseaux & IP",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 6,
+                    "title": "GitHub Tout-osint",
+                    "url": "https://github.com",
+                    "domain": "github.com",
+                    "description": "Dépôts et outils OSINT sur GitHub.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 8,
+                    "title": "Outils OSINT",
+                    "url": "https://osintfr.com",
+                    "domain": "osintfr.com",
+                    "description": "Ressources et outils d'investigation francophones.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 9,
+                    "title": "OathNet Intelligence",
+                    "url": "https://oathnet.org",
+                    "domain": "oathnet.org",
+                    "description": "Plateforme de renseignement et OSINT.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 10,
+                    "title": "SeekNow Platform",
+                    "url": "https://see-know.ru",
+                    "domain": "see-know.ru",
+                    "description": "Recherche et indexation d'indices.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 11,
+                    "title": "Kerbes OSINT",
+                    "url": "https://kerbes.org",
+                    "domain": "kerbes.org",
+                    "description": "Outils et liens d'investigation.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 12,
+                    "title": "BrixHub",
+                    "url": "https://brixhub.to",
+                    "domain": "brixhub.to",
+                    "description": "Plateforme de ressources et liens utiles.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 13,
+                    "title": "Stryxx",
+                    "url": "https://stryxx.net",
+                    "domain": "stryxx.net",
+                    "description": "Outil de recherche et d'investigation.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 14,
+                    "title": "Localiser IP",
+                    "url": "https://trouver-ip.com",
+                    "domain": "trouver-ip.com",
+                    "description": "Outil de géolocalisation d'adresses IP.",
+                    "category": "Réseaux & IP",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 15,
+                    "title": "Marine Data",
+                    "url": "https://github.io",
+                    "domain": "github.io",
+                    "description": "Données maritimes et traçage.",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 1788716527499,
+                    "title": "Venice AI Uncensored",
+                    "url": "https://venice.ai/chat/",
+                    "domain": "venice.ai",
+                    "description": "Une IA sans censure",
+                    "category": "IA & Outils",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 1791120938676,
+                    "title": "Astral Searcher",
+                    "url": "https://astralsearcher.org",
+                    "domain": "astralsearcher.org",
+                    "description": "osent recherche simplifié",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 1791120980122,
+                    "title": "CSINT tool",
+                    "url": "https://www.csint.tools",
+                    "domain": "www.csint.tools",
+                    "description": "Intelligence plateforme",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          },
+          {
+                    "id": 1791121227515,
+                    "title": "Intelligence X",
+                    "url": "https://intelx.io",
+                    "domain": "intelx.io",
+                    "description": "Osint recherche nom prénom et autres",
+                    "category": "OSINT",
+                    "favorite": false,
+                    "customIcon": ""
+          }
+];
+        window.TARGET_NOTES_DATA = "";
+                </script>
+
+    <script>
+        const STORAGE_KEY = 'osint-dashboard-v23';
+        let folders = window.INITIAL_FOLDERS;
+        let linksData = window.INITIAL_LINKS;
+        let activeFolder = 'all';
+        let searchQuery = '';
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    folders,
+                    linksData,
+                    notes: window.TARGET_NOTES_DATA || '',
+                    theme: document.documentElement.getAttribute('data-theme') || 'dark',
+                    sidebarMinimized: document.body.classList.contains('sidebar-minimized'),
+                    columns: getComputedStyle(document.documentElement).getPropertyValue('--columns-count').trim()
+                }));
+            } catch (e) { console.warn('Impossible de sauvegarder les données locales.', e); }
+        }
+
+        function loadState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+                if (!saved) return;
+                if (Array.isArray(saved.folders)) folders = saved.folders;
+                if (Array.isArray(saved.linksData)) linksData = saved.linksData;
+                window.TARGET_NOTES_DATA = saved.notes || '';
+                if (saved.theme === 'light' || saved.theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', saved.theme);
+                }
+                if (saved.columns) document.documentElement.style.setProperty('--columns-count', saved.columns);
+                if (saved.sidebarMinimized) document.body.classList.add('sidebar-minimized');
+            } catch (e) { console.warn('Données locales invalides, utilisation des données par défaut.', e); }
+        }
+
+        function downloadCurrentHtml() {
+            saveNotes();
+            
+            let docCopy = document.documentElement.cloneNode(true);
+            
+            const scriptData = docCopy.querySelector('#embedded-data');
+            if (scriptData) {
+                scriptData.textContent = `
+        window.INITIAL_FOLDERS = ${JSON.stringify(folders, null, 12)};
+        window.INITIAL_LINKS = ${JSON.stringify(linksData, null, 12)};
+        window.TARGET_NOTES_DATA = ${JSON.stringify(window.TARGET_NOTES_DATA || '')};
+                `;
+            }
+
+            const htmlContent = "<!DOCTYPE html>\n" + docCopy.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'osint-workspace.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            document.getElementById('target-notes').value = window.TARGET_NOTES_DATA || '';
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('search-bar').focus();
+                }
+                if (e.key === 'Escape') {
+                    closeModal();
+                    closeContactModal();
+                    closeAllMenus();
+                }
+            });
+
+            renderFolders();
+            renderCards();
+
+            const sidebarButton = document.getElementById('sidebar-toggle');
+            if (sidebarButton) {
+                const minimized = document.body.classList.contains('sidebar-minimized');
+                sidebarButton.textContent = minimized ? '▶' : '◀';
+                sidebarButton.title = minimized ? 'Ouvrir la barre latérale' : 'Réduire la barre latérale';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.menu-dots-btn') && !e.target.closest('.folder-dropdown-menu') && !e.target.closest('.card-dropdown-menu')) {
+                closeAllMenus();
+            }
+        });
+
+        function changeColumns(count) {
+            document.documentElement.style.setProperty('--columns-count', count);
+            saveState();
+        }
+
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-minimized');
+
+            const minimized = document.body.classList.contains('sidebar-minimized');
+            const button = document.getElementById('sidebar-toggle');
+            if (button) {
+                button.textContent = minimized ? '▶' : '◀';
+                button.title = minimized ? 'Ouvrir la barre latérale' : 'Réduire la barre latérale';
+                button.setAttribute('aria-label', button.title);
+            }
+
+            saveState();
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            document.documentElement.setAttribute('data-theme', currentTheme === 'light' ? 'dark' : 'light');
+            saveState();
+        }
+
+        function closeAllMenus() {
+            document.querySelectorAll('.folder-dropdown-menu, .card-dropdown-menu').forEach(m => m.classList.remove('show'));
+        }
+
+        function saveNotes() {
+            window.TARGET_NOTES_DATA = document.getElementById('target-notes').value;
+            saveState();
+        }
+
+        function clearNotes() {
+            if (confirm("Voulez-vous effacer toutes les notes de la cible ?")) {
+                document.getElementById('target-notes').value = '';
+                window.TARGET_NOTES_DATA = '';
+                saveState();
+            }
+        }
+
+        function openAddModal() {
+            if (folders.length === 0) {
+                alert("Veuillez d'abord créer au moins une catégorie dans la barre latérale.");
+                return;
+            }
+
+            document.getElementById('editing-link-id').value = '';
+            document.getElementById('modal-title-text').innerText = "Ajouter un site";
+            document.getElementById('new-link-title').value = '';
+            document.getElementById('new-link-url').value = '';
+            document.getElementById('new-link-icon').value = '';
+            document.getElementById('new-link-desc').value = '';
+            
+            updateCategorySelectOptions();
+            document.getElementById('add-modal').classList.add('open');
+        }
+
+        function openEditModal(id) {
+            closeAllMenus();
+            const item = linksData.find(l => l.id === id);
+            if (!item) return;
+
+            document.getElementById('editing-link-id').value = item.id;
+            document.getElementById('modal-title-text').innerText = "Modifier la ressource";
+            document.getElementById('new-link-title').value = item.title;
+            document.getElementById('new-link-url').value = item.url;
+            document.getElementById('new-link-icon').value = item.customIcon || '';
+            document.getElementById('new-link-desc').value = item.description || '';
+            
+            updateCategorySelectOptions(item.category);
+            document.getElementById('add-modal').classList.add('open');
+        }
+
+        function updateCategorySelectOptions(selectedCat = '') {
+            const selectFolderElem = document.getElementById('new-link-folder');
+            selectFolderElem.innerHTML = '';
+            folders.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.name;
+                opt.innerText = `${f.icon || '📁'} ${f.name}`;
+                selectFolderElem.appendChild(opt);
+            });
+            if (selectedCat && folders.some(f => f.name === selectedCat)) {
+                selectFolderElem.value = selectedCat;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').classList.remove('open');
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target.id === 'add-modal') closeModal();
+        }
+
+        function saveLink() {
+            const id = document.getElementById('editing-link-id').value;
+            const title = document.getElementById('new-link-title').value.trim();
+            const url = document.getElementById('new-link-url').value.trim();
+            const icon = document.getElementById('new-link-icon').value.trim();
+            const desc = document.getElementById('new-link-desc').value.trim();
+            const folder = document.getElementById('new-link-folder').value;
+
+            if (!title || !url) {
+                alert("Le titre et l'URL sont requis.");
+                return;
+            }
+
+            let domain = "lien.local";
+            try {
+                domain = new URL(url).hostname;
+            } catch(e){}
+
+            if (id) {
+                const item = linksData.find(l => l.id == id);
+                if (item) {
+                    item.title = title;
+                    item.url = url;
+                    item.customIcon = icon;
+                    item.description = desc;
+                    item.category = folder;
+                    item.domain = domain;
+                }
+            } else {
+                linksData.push({
+                    id: Date.now(),
+                    title: title,
+                    url: url,
+                    domain: domain,
+                    description: desc,
+                    category: folder,
+                    favorite: false,
+                    customIcon: icon
+                });
+            }
+
+            closeModal();
+            renderFolders();
+            renderCards();
+            saveState();
+        }
+
+        function deleteLink(id) {
+            if (confirm("Supprimer ce site ?")) {
+                linksData = linksData.filter(l => l.id !== id);
+                renderFolders();
+                renderCards();
+                saveState();
+            }
+        }
+
+        function openContactModal() {
+            document.getElementById('contact-nom').value = '';
+            document.getElementById('contact-prenom').value = '';
+            document.getElementById('contact-telephone').value = '';
+            document.getElementById('contact-travail').value = '';
+            document.getElementById('contact-ip').value = '';
+            document.getElementById('contact-adresse').value = '';
+            document.getElementById('contact-codepostaler').value = '';
+            document.getElementById('contact-dae').value = '';
+            document.getElementById('contact-immatriculation').value = '';
+            document.getElementById('contact-modal').classList.add('open');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contact-modal').classList.remove('open');
+        }
+
+        function closeContactModalOnOverlay(e) {
+            if (e.target.id === 'contact-modal') closeContactModal();
+        }
+
+        function saveContact() {
+            const nom = document.getElementById('contact-nom').value.trim();
+            const prenom = document.getElementById('contact-prenom').value.trim();
+            const tel = document.getElementById('contact-telephone').value.trim();
+            const travail = document.getElementById('contact-travail').value.trim();
+            const ip = document.getElementById('contact-ip').value.trim();
+            const adresse = document.getElementById('contact-adresse').value.trim();
+            const cp = document.getElementById('contact-codepostaler').value.trim();
+            const dae = document.getElementById('contact-dae').value.trim();
+            const immat = document.getElementById('contact-immatriculation').value.trim();
+
+            if (!nom && !prenom) {
+                alert("Veuillez renseigner au moins un nom ou un prénom.");
+                return;
+            }
+
+            const fullName = `${prenom} ${nom}`.trim();
+            let descParts = [];
+            if (tel) descParts.push(`Tél: ${tel}`);
+            if (travail) descParts.push(`Travail: ${travail}`);
+            if (ip) descParts.push(`IP: ${ip}`);
+            if (adresse || cp) descParts.push(`Adresse: ${adresse} (${cp})`);
+            if (dae) descParts.push(`Né(e) le: ${dae}`);
+            if (immat) descParts.push(`Immat: ${immat}`);
+
+            let targetCategory = folders[0] ? folders[0].name : "Outils et utilitaires";
+
+            linksData.push({
+                id: Date.now(),
+                title: fullName,
+                url: "#",
+                domain: "contact.local",
+                description: descParts.join(" | ") || "Contact enregistré",
+                category: targetCategory,
+                favorite: false,
+                customIcon: "👤"
+            });
+
+            closeContactModal();
+            renderFolders();
+            renderCards();
+            saveState();
+        }
+
+        function toggleFavorite(id, event) {
+            if (event) event.stopPropagation();
+            const item = linksData.find(l => l.id === id);
+            if (item) {
+                item.favorite = !item.favorite;
+                renderFolders();
+                renderCards();
+                saveState();
+            }
+        }
+
+        function toggleCardMenu(event, id) {
+            if (event) event.stopPropagation();
+            closeAllMenus();
+            
+            let menu = document.getElementById(`card-menu-${id}`);
+            if (!menu) {
+                menu = document.createElement('div');
+                menu.id = `card-menu-${id}`;
+                menu.className = 'card-dropdown-menu';
+                menu.innerHTML = `
+                    <button class="dropdown-item" onclick="openEditModal(${id})">✏️ Éditer</button>
+                    <button class="dropdown-item danger" onclick="deleteLink(${id})">🗑️ Supprimer</button>
+                `;
+                document.body.appendChild(menu);
+            }
+            
+            const rect = event.target.getBoundingClientRect();
+            menu.style.top = `${rect.bottom + window.scrollY}px`;
+            menu.style.left = `${rect.left - 120}px`;
+            menu.classList.add('show');
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-bar').value.toLowerCase();
+            document.getElementById('clear-search').style.display = searchQuery ? 'flex' : 'none';
+            renderCards();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-bar').value = '';
+            searchQuery = '';
+            document.getElementById('clear-search').style.display = 'none';
+            renderCards();
+        }
+
+        function selectFolder(folder) {
+            activeFolder = folder;
+            renderFolders();
+            renderCards();
+        }
+
+        function promptAddFolder() {
+            const name = prompt("Nom de la nouvelle catégorie :");
+            if (name) {
+                const icon = prompt("Emoji d'illustration :", "📁") || "📁";
+                const cleanName = name.trim();
+                if (!cleanName || folders.some(f => f.name.toLowerCase() === cleanName.toLowerCase())) {
+                    alert('Cette catégorie existe déjà ou est invalide.');
+                    return;
+                }
+                folders.push({ name: cleanName, icon: icon.trim() });
+                renderFolders();
+                saveState();
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>'"]/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[char]));
+        }
+
+        function toggleFolderMenu(event, index) {
+            event.stopPropagation();
+            closeAllMenus();
+            const folder = folders[index];
+            if (!folder) return;
+
+            const menu = document.createElement('div');
+            menu.id = 'folder-menu-active';
+            menu.className = 'folder-dropdown-menu show';
+            menu.innerHTML = `
+                <button class="dropdown-item" onclick="renameFolder(${index})">✏️ Renommer</button>
+                <button class="dropdown-item" onclick="changeFolderIcon(${index})">🎨 Changer l’icône</button>
+                <button class="dropdown-item danger" onclick="deleteFolder(${index})">🗑️ Supprimer</button>
+            `;
+            document.body.appendChild(menu);
+
+            const rect = event.currentTarget.getBoundingClientRect();
+            menu.style.top = `${rect.bottom + 6}px`;
+            menu.style.left = `${Math.max(8, rect.right - 190)}px`;
+        }
+
+        function renameFolder(index) {
+            const folder = folders[index];
+            if (!folder) return;
+            const name = prompt('Nouveau nom de la catégorie :', folder.name);
+            if (name === null) return;
+            const cleanName = name.trim();
+            if (!cleanName) return alert('Le nom ne peut pas être vide.');
+            if (folders.some((f, i) => i !== index && f.name.toLowerCase() === cleanName.toLowerCase())) {
+                return alert('Cette catégorie existe déjà.');
+            }
+
+            const oldName = folder.name;
+            folder.name = cleanName;
+            linksData.forEach(link => { if (link.category === oldName) link.category = cleanName; });
+            if (activeFolder === oldName) activeFolder = cleanName;
+            closeAllMenus();
+            renderFolders();
+            renderCards();
+            saveState();
+        }
+
+        function changeFolderIcon(index) {
+            const folder = folders[index];
+            if (!folder) return;
+            const icon = prompt('Nouvelle icône (emoji ou URL d’image) :', folder.icon || '📁');
+            if (icon === null) return;
+            const cleanIcon = icon.trim();
+            folder.icon = cleanIcon || '📁';
+            closeAllMenus();
+            renderFolders();
+            saveState();
+        }
+
+        function deleteFolder(index) {
+            const folder = folders[index];
+            if (!folder) return;
+            if (folders.length === 1) {
+                return alert('Impossible de supprimer la dernière catégorie. Créez-en une autre avant.');
+            }
+
+            const usedLinks = linksData.filter(link => link.category === folder.name);
+            let target = null;
+            if (usedLinks.length) {
+                const choices = folders.filter((_, i) => i !== index);
+                const names = choices.map((f, i) => `${i + 1}. ${f.name}`).join('\n');
+                const answer = prompt(`Cette catégorie contient ${usedLinks.length} élément(s).\n\nChoisissez la catégorie de destination :\n${names}`, '1');
+                if (answer === null) return;
+                const choice = Number(answer) - 1;
+                target = choices[choice];
+                if (!target) return alert('Choix invalide.');
+            }
+
+            if (!confirm(`Supprimer la catégorie « ${folder.name} » ?`)) return;
+            if (target) linksData.forEach(link => { if (link.category === folder.name) link.category = target.name; });
+
+            const oldName = folder.name;
+            folders.splice(index, 1);
+            if (activeFolder === oldName) activeFolder = target ? target.name : 'all';
+            closeAllMenus();
+            renderFolders();
+            renderCards();
+            saveState();
+        }
+
+        function renderFolders() {
+            const globalNavList = document.getElementById('global-nav-list');
+            const folderList = document.getElementById('folder-list');
+            
+            globalNavList.innerHTML = '';
+            folderList.innerHTML = '';
+
+            const liAll = document.createElement('li');
+            liAll.className = `folder-item ${activeFolder === 'all' ? 'active' : ''}`;
+            liAll.onclick = () => selectFolder('all');
+            liAll.innerHTML = `
+                <div class="folder-left"><span>📂</span><span>Tous les éléments</span></div>
+                <div class="folder-right"><span class="folder-count">${linksData.length}</span></div>
+            `;
+            globalNavList.appendChild(liAll);
+
+            const favCount = linksData.filter(l => l.favorite).length;
+            const liFav = document.createElement('li');
+            liFav.className = `folder-item ${activeFolder === 'fav' ? 'active' : ''}`;
+            liFav.onclick = () => selectFolder('fav');
+            liFav.innerHTML = `
+                <div class="folder-left"><span style="color: var(--star-color);">⭐</span><span>Favoris</span></div>
+                <div class="folder-right"><span class="folder-count">${favCount}</span></div>
+            `;
+            globalNavList.appendChild(liFav);
+
+            folders.forEach((f, index) => {
+                const count = linksData.filter(l => l.category === f.name).length;
+                const li = document.createElement('li');
+                li.className = `folder-item ${activeFolder === f.name ? 'active' : ''}`;
+                li.onclick = () => selectFolder(f.name);
+                li.innerHTML = `
+                    <div class="folder-left"><span>${escapeHtml(f.icon || '📁')}</span><span>${escapeHtml(f.name)}</span></div>
+                    <div class="folder-right">
+                        <span class="folder-count">${count}</span>
+                        <button class="folder-menu-btn" title="Modifier la catégorie" onclick="toggleFolderMenu(event, ${index})">⋮</button>
+                    </div>
+                `;
+                folderList.appendChild(li);
+            });
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            let filtered = linksData;
+
+            if (activeFolder === 'fav') {
+                filtered = filtered.filter(l => l.favorite);
+            } else if (activeFolder !== 'all') {
+                filtered = filtered.filter(l => l.category === activeFolder);
+            }
+
+            if (searchQuery) {
+                filtered = filtered.filter(l => 
+                    l.title.toLowerCase().includes(searchQuery) || 
+                    l.description.toLowerCase().includes(searchQuery) ||
+                    l.domain.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            filtered.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.style.animationDelay = `${index * 0.02}s`;
+
+                let iconHtml = `<span>🔗</span>`;
+                if (item.customIcon) {
+                    if (item.customIcon.startsWith('http') || item.customIcon.startsWith('data:')) {
+                        iconHtml = `<img src="${item.customIcon}" alt="">`;
+                    } else {
+                        iconHtml = `<span>${item.customIcon}</span>`;
+                    }
+                } else if (item.url !== '#') {
+                    iconHtml = `<img src="https://www.google.com/s2/favicons?domain=${item.domain}&sz=64" onerror="this.parentElement.innerText='🔗'">`;
+                }
+
+                card.innerHTML = `
+                    <div class="item-top-actions">
+                        <button class="star-btn ${item.favorite ? 'active' : ''}" onclick="toggleFavorite(${item.id}, event)">
+                            ${item.favorite ? '★' : '☆'}
+                        </button>
+                        <button class="menu-dots-btn" onclick="toggleCardMenu(event, ${item.id})">⋮</button>
+                    </div>
+
+                    <div class="item-header">
+                        <div class="item-icon-wrapper">${iconHtml}</div>
+                        <div class="item-info">
+                            <div class="item-title">${item.title}</div>
+                            <a href="${item.url}" target="_blank" class="item-url-text">${item.domain}</a>
+                        </div>
+                    </div>
+                    <div class="item-desc">${item.description || ''}</div>
+                    <div class="item-footer">
+                        <span class="item-badge">${item.category}</span>
+                        ${item.isContactTool ? 
+                            `<button class="btn-glass btn-primary" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openContactModal()">Créer un contact ➕</button>` :
+                            `<a href="${item.url}" target="_blank" class="btn-glass" style="padding: 5px 12px; font-size: 0.75rem;">Visiter ↗</a>`
+                        }
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+
+<div id="card-menu-10" class="card-dropdown-menu" style="top: 316.703125px; left: 617.078125px;">
+                    <button class="dropdown-item" onclick="openEditModal(10)">✏️ Éditer</button>
+                    <button class="dropdown-item danger" onclick="deleteLink(10)">🗑️ Supprimer</button>
+                </div><div id="card-menu-1791120938676" class="card-dropdown-menu" style="top: 513.890625px; left: 1021.21875px;">
+                    <button class="dropdown-item" onclick="openEditModal(1791120938676)">✏️ Éditer</button>
+                    <button class="dropdown-item danger" onclick="deleteLink(1791120938676)">🗑️ Supprimer</button>
+                </div><div id="card-menu-16" class="card-dropdown-menu" style="top: 272.515625px; left: 1021.21875px;">
+                    <button class="dropdown-item" onclick="openEditModal(16)">✏️ Éditer</button>
+                    <button class="dropdown-item danger" onclick="deleteLink(16)">🗑️ Supprimer</button>
+                </div><div id="card-menu-3" class="card-dropdown-menu" style="top: 465.515625px; left: 617.078125px;">
+                    <button class="dropdown-item" onclick="openEditModal(3)">✏️ Éditer</button>
+                    <button class="dropdown-item danger" onclick="deleteLink(3)">🗑️ Supprimer</button>
+                </div></body></html>
