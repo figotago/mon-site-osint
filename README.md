@@ -15,6 +15,7 @@ La date de sortie de la prochaine Mise A Jour entre 29 novembre et 6 décembre
 - Correction de bug
 - Adaptation d'interface pour mobile
 - ajout de nouveau site
+- Nouveau outils et fonction
 - Ajout de la politique de confidentialité et conditions d'utilisation
 - Optimisation de l'interface pour rendre le site 3x plus rapide
 - Modification avec des couleur neutre moins d'animation et plus professionel
